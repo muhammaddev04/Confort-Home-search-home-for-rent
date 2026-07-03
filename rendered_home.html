@@ -1,0 +1,1222 @@
+
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comfort Home — Асосӣ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&subset=cyrillic&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind config — бояд ҳамин ҷо, пеш аз рендери HTML бимонад
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EAF3EF',
+                            100: '#D2E6DC',
+                            DEFAULT: '#0B3D2E',
+                            dark: '#C9A24B',
+                        },
+                        darkbg: {
+                            DEFAULT: '#0f172a',
+                            card: '#1e293b',
+                        },
+                        ink: '#1C1C1A',
+                        cream: '#FBF8F3',
+                        surface: '#F4EFE6',
+                        emerald: {
+                            DEFAULT: '#0B3D2E',
+                            mid: '#1F5C46',
+                        },
+                        gold: {
+                            DEFAULT: '#C9A24B',
+                            dark: '#B8923F',
+                        },
+                        accent: {
+                            DEFAULT: '#C9A24B',
+                            light: '#F3E7CC',
+                        },
+                        coral: '#C9A24B',
+                        saffron: '#C9A24B',
+                        pamir: '#178A56',
+                        stone: '#8B8378',
+                    },
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        soft: '0 20px 50px -25px rgba(11,61,46,0.25)',
+                        lifted: '0 30px 60px -20px rgba(11,61,46,0.35)',
+                    }
+                }
+            }
+        }
+
+        // Танзими аввалаи реҷим — пеш аз рендер, барои пешгирии "флэш"-и рӧшан пеш аз торикшавӣ
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .font-display{ font-family:'Playfair Display', serif; }
+        body{ font-family:'Inter', sans-serif; }
+
+        .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+        .reveal.in { opacity: 1; transform: translateY(0); }
+
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.3); }
+            60% { transform: scale(0.94); }
+            100% { transform: scale(1); }
+        }
+        .is-favorite i { animation: heartPop .4s ease; }
+
+        .card-hover { transition: transform .4s cubic-bezier(.22,.61,.36,1), box-shadow .4s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 24px 50px -22px rgba(11,61,46,0.28); }
+
+        .img-zoom { overflow: hidden; }
+        .img-zoom img { transition: transform .7s cubic-bezier(.22,.61,.36,1); }
+        .img-zoom:hover img { transform: scale(1.06); }
+
+        .underline-grow { position: relative; }
+        .underline-grow::after {
+            content: ''; position: absolute; left: 0; bottom: -3px; width: 0; height: 1px;
+            background: #C9A24B; transition: width .3s ease;
+        }
+        .underline-grow:hover::after { width: 100%; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+        }
+
+        /* ============ Comfort Home — shared component styles ============ */
+        .gradient-text {
+            background-image: linear-gradient(135deg, #0B3D2E 0%, #1F5C46 45%, #C9A24B 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .gradient-btn {
+            background-image: linear-gradient(135deg, #0B3D2E 0%, #1F5C46 100%);
+            transition: filter .3s ease, transform .3s ease, box-shadow .3s ease;
+        }
+        .gradient-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+        .glow-shadow { box-shadow: 0 18px 40px -18px rgba(201,162,75,0.45); }
+
+        /* Styling for Django's auto-rendered <input>/<select>/<textarea> widgets */
+        .dh-form input[type="text"],
+        .dh-form input[type="email"],
+        .dh-form input[type="number"],
+        .dh-form input[type="password"],
+        .dh-form input[type="tel"],
+        .dh-form input[type="file"],
+        .dh-form select,
+        .dh-form textarea {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(28,28,26,0.14);
+            background: #FBF8F3;
+            color: #1C1C1A;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .dark .dh-form input[type="text"],
+        .dark .dh-form input[type="email"],
+        .dark .dh-form input[type="number"],
+        .dark .dh-form input[type="password"],
+        .dark .dh-form input[type="tel"],
+        .dark .dh-form input[type="file"],
+        .dark .dh-form select,
+        .dark .dh-form textarea {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.12);
+            color: #ffffff;
+        }
+        .dh-form input:focus, .dh-form select:focus, .dh-form textarea:focus {
+            outline: none;
+            border-color: #C9A24B;
+            box-shadow: 0 0 0 3px rgba(201,162,75,0.22);
+        }
+        .dh-form input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: #0B3D2E; cursor: pointer; }
+        .dh-form label { display: block; font-size: 0.8rem; font-weight: 600; color: #8B8378; text-transform: uppercase; letter-spacing: .02em; margin-bottom: 0.35rem; }
+        .dark .dh-form label { color: #9CA3AF; }
+
+        /* Keyboard-focus ring — visible only for keyboard navigation, not mouse clicks */
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+            outline: 2px solid #C9A24B;
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body class="bg-cream dark:bg-darkbg font-sans text-ink dark:text-gray-100 flex flex-col min-h-screen">
+
+    <nav class="bg-cream/90 dark:bg-darkbg-card/90 backdrop-blur-md sticky top-0 z-50 border-b border-ink/10 dark:border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            <div class="flex items-center">
+                <a href="/" class="text-xl sm:text-2xl font-display font-bold text-ink dark:text-white tracking-tight">
+                    Comfort <span class="text-emerald dark:text-gold">Home</span>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-1 sm:gap-2">
+                <div class="hidden lg:flex items-center gap-1">
+                    <a href="/" data-lang="nav_home" class="underline-grow px-4 py-2 text-ink/70 dark:text-gray-300 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Асосӣ</a>
+                    <a href="/about/" data-lang="nav_about" class="underline-grow px-4 py-2 text-ink/70 dark:text-gray-300 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Дар бораи мо</a>
+                    <a href="/my-properties/" data-lang="nav_properties" class="underline-grow px-4 py-2 text-ink/70 dark:text-gray-300 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Амволҳо</a>
+
+                    <div class="h-6 w-px bg-ink/10 dark:bg-gray-700 mx-2"></div> 
+                        
+
+                        
+                        <a href="/create-property/" data-lang="nav_add" class="bg-emerald hover:bg-emerald-mid text-white px-4 py-2 rounded-lg font-display font-semibold text-sm transition">Эълон +</a>
+                        <a href="/create-propertyimages/" data-lang="add_images" class="border border-ink/15 dark:border-white/10 text-ink/70 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-ink/5 dark:hover:bg-white/10 font-medium transition text-sm">Иловаи сурат +</a>
+                        
+
+                        <a href="/auth/logout/" data-lang="logout_btn" class="border border-ink/15 dark:border-white/10 text-ink/70 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-ink/5 dark:hover:bg-white/10 font-medium transition text-sm">Баромад</a>
+                    
+                </div>
+
+                <select id="langSelector" aria-label="Забони сайт / Язык сайта / Site language" class="bg-white dark:bg-white/10 border border-ink/10 dark:border-white/10 text-ink/70 dark:text-white py-1.5 px-2 sm:px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-gold cursor-pointer text-xs sm:text-sm font-medium ml-1">
+                    <option value="tg">🇹🇯 ТҶ</option>
+                    <option value="ru">🇷🇺 РУ</option>
+                    <option value="en">🇬🇧 EN</option>
+                </select>
+                <button id="theme-toggle" aria-label="Иваз кардани реҷими торик/рӯшан" class="p-2 rounded-lg border border-ink/10 dark:border-white/10 hover:bg-ink/5 dark:hover:bg-white/10 transition">
+                    <i class="fa-solid fa-moon dark:hidden text-ink/70 text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-gold text-sm"></i>
+                </button>
+
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald text-white rounded-full flex items-center justify-center font-display font-bold text-xs sm:text-sm ml-0.5 sm:ml-1 shrink-0" title="qalandlord">
+                    Q
+                </div>
+
+                <button id="mobile-menu-toggle" class="lg:hidden p-2 rounded-lg border border-ink/10 dark:border-white/10 hover:bg-ink/5 dark:hover:bg-white/10 transition text-ink/70 dark:text-white ml-0.5" aria-label="Кушодани меню" aria-expanded="false" aria-controls="mobile-menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MOBILE MENU ============ -->
+    <div id="mobile-menu" class="hidden lg:hidden border-t border-ink/10 dark:border-gray-800 bg-cream dark:bg-darkbg-card px-4 pt-3 pb-5 space-y-1" role="dialog" aria-modal="true" aria-label="Менюи мобилӣ">
+        <a href="/" data-lang="nav_home" class="block px-4 py-3 rounded-lg text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Асосӣ</a>
+        <a href="/about/" data-lang="nav_about" class="block px-4 py-3 rounded-lg text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Дар бораи мо</a>
+        <a href="/my-properties/" data-lang="nav_properties" class="block px-4 py-3 rounded-lg text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Амволҳо</a>
+
+        <div class="h-px bg-ink/10 dark:bg-gray-800 my-2"></div>
+
+        
+            
+            
+            <a href="/create-property/" data-lang="nav_add" class="block text-center px-4 py-3 rounded-lg bg-emerald text-white font-display font-semibold text-sm transition">Эълон +</a>
+            <a href="/create-propertyimages/" data-lang="add_images" class="block px-4 py-3 rounded-lg border border-ink/15 dark:border-white/10 text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/10 font-medium transition text-sm">Иловаи сурат +</a>
+            
+            <a href="/auth/logout/" data-lang="logout_btn" class="block px-4 py-3 rounded-lg border border-ink/15 dark:border-white/10 text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/10 font-medium transition text-sm">Баромад</a>
+        
+    </div>
+</nav>
+
+<script>
+    // Тугмаи менюи мобилӣ (танҳо UI-и nav — ба translations/dark-mode/chat дахл надорад)
+    (function () {
+        const toggle = document.getElementById('mobile-menu-toggle');
+        const menu = document.getElementById('mobile-menu');
+        if (!toggle || !menu) return;
+
+        const closeMenu = () => {
+            menu.classList.add('hidden');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+        };
+        const openMenu = () => {
+            menu.classList.remove('hidden');
+            toggle.setAttribute('aria-expanded', 'true');
+            toggle.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        };
+
+        toggle.addEventListener('click', () => {
+            menu.classList.contains('hidden') ? openMenu() : closeMenu();
+        });
+        menu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) closeMenu();
+        });
+    })();
+
+    // Аниматсияи "reveal" ҳангоми scroll — барои ҳамаи саҳифаҳое, ки аз ин base мерос мегиранд
+    (function () {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => entry.target.classList.add('in'), i * 60);
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    })();
+</script>
+
+    <main class="flex-grow">
+        
+
+    <!-- ============ HERO ============ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-10">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 lg:gap-16 items-center">
+            <div class="lg:col-span-2 order-2 lg:order-1">
+                <p class="reveal in text-gold text-xs font-semibold uppercase tracking-[0.25em] mb-5">Comfort Home · Тоҷикистон</p>
+                <h1 data-lang="hero_title" class="reveal in font-display text-4xl sm:text-5xl font-bold text-ink dark:text-white leading-[1.15] mb-6">Хонаи орзуҳои худро бо Comfort Home пайдо кунед</h1>
+                <p data-lang="hero_sub" class="reveal in text-base text-stone dark:text-gray-400 mb-8 leading-relaxed">Беҳтарин амволҳо ва хонаҳо барои иҷора дар Тоҷикистон.</p>
+                <div class="reveal in flex items-center gap-8">
+                    <div>
+                        <span class="font-display text-3xl font-bold text-ink dark:text-white" data-count-to="0">0</span>
+                        <p class="text-stone text-xs mt-1" data-lang="stat_properties_short">амвол ёфт шуд</p>
+                    </div>
+                    <div class="w-px h-10 bg-ink/10 dark:bg-white/10"></div>
+                    <div>
+                        <span class="font-display text-3xl font-bold text-ink dark:text-white" data-count-to="12">0</span>
+                        <p class="text-stone text-xs mt-1">шаҳр таҳти хизматрасонӣ</p>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-3 order-1 lg:order-2">
+                <div class="reveal in relative">
+                    <div class="absolute -inset-3 border border-gold/40 rounded-3xl hidden sm:block"></div>
+                    <div class="img-zoom rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_30px_70px_-30px_rgba(11,61,46,0.35)]">
+                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80" alt="Хонаи муосир" class="w-full h-64 sm:h-96 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ SEARCH ============ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <form method="GET" action="/" class="reveal in bg-white dark:bg-white/5 p-5 sm:p-6 rounded-2xl shadow-soft border border-ink/5 dark:border-white/10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <div><label class="block text-xs font-bold text-stone uppercase mb-1 px-1">Шаҳр</label><input type="text" name="q" value="" placeholder="Душанбе..." class="w-full px-3 py-2.5 bg-cream dark:bg-white/5 dark:text-white rounded-lg border border-ink/10 dark:border-white/10 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm transition"></div>
+            <div><label class="block text-xs font-bold text-stone uppercase mb-1 px-1">Ноҳия</label><input type="text" name="qu" value="" placeholder="Ноҳия..." class="w-full px-3 py-2.5 bg-cream dark:bg-white/5 dark:text-white rounded-lg border border-ink/10 dark:border-white/10 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm transition"></div>
+            <div><label class="block text-xs font-bold text-stone uppercase mb-1 px-1">Нарх аз</label><input type="number" name="min_price" value="" placeholder="Мин" class="w-full px-3 py-2.5 bg-cream dark:bg-white/5 dark:text-white rounded-lg border border-ink/10 dark:border-white/10 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm transition"></div>
+            <div><label class="block text-xs font-bold text-stone uppercase mb-1 px-1">Нарх то</label><input type="number" name="max_price" value="" placeholder="Макс" class="w-full px-3 py-2.5 bg-cream dark:bg-white/5 dark:text-white rounded-lg border border-ink/10 dark:border-white/10 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm transition"></div>
+            <button type="submit" class="w-full gradient-btn text-white py-[11px] rounded-lg font-display font-semibold transition text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-magnifying-glass"></i> <span data-lang="search_btn">Ҷустуҷӯ</span></button>
+        </form>
+    </div>
+
+    <!-- ============ CATEGORIES ============ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div class="reveal in mb-8">
+            <p class="text-gold text-xs font-semibold uppercase tracking-[0.2em] mb-2">Категорияҳо</p>
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-ink dark:text-white">Навъи амволро интихоб кунед</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <a href="/search/?property_type=apartment" class="reveal in card-hover img-zoom relative rounded-2xl overflow-hidden h-48 flex items-end p-6">
+                <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent"></div>
+                <span class="relative font-display text-lg font-semibold text-white">Квартира</span>
+            </a>
+            <a href="/search/?property_type=house" class="reveal in card-hover img-zoom relative rounded-2xl overflow-hidden h-48 flex items-end p-6">
+                <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=600&q=80" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent"></div>
+                <span class="relative font-display text-lg font-semibold text-white">Ҳавлигӣ</span>
+            </a>
+            <a href="/search/?property_type=room" class="reveal in card-hover img-zoom relative rounded-2xl overflow-hidden h-48 flex items-end p-6">
+                <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent"></div>
+                <span class="relative font-display text-lg font-semibold text-white">Ҳуҷра</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ============ WHY CHOOSE US ============ -->
+    <div class="bg-white dark:bg-darkbg-card py-16 border-y border-ink/5 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal in text-center max-w-xl mx-auto mb-12">
+                <p class="text-gold text-xs font-semibold uppercase tracking-[0.2em] mb-2" data-lang="about_why_title">Чаро маҳз мо?</p>
+                <h2 class="font-display text-2xl sm:text-3xl font-bold text-ink dark:text-white" data-lang="about_f1_title">Амнияти Пурра</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                <div class="reveal in"><div class="w-14 h-14 rounded-full bg-cream dark:bg-white/5 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-shield-halved text-emerald dark:text-gold"></i></div><h3 class="font-display font-semibold mb-1 text-ink dark:text-white text-sm">Тасдиқи ҳуҷҷатҳо</h3><p class="text-stone dark:text-gray-400 text-xs">Ҳамаи соҳибони амвол санҷида мешаванд.</p></div>
+                <div class="reveal in"><div class="w-14 h-14 rounded-full bg-cream dark:bg-white/5 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-headset text-emerald dark:text-gold"></i></div><h3 class="font-display font-semibold mb-1 text-ink dark:text-white text-sm">Дастгирии доимӣ</h3><p class="text-stone dark:text-gray-400 text-xs">Ҷавоб бо се забон.</p></div>
+                <div class="reveal in"><div class="w-14 h-14 rounded-full bg-cream dark:bg-white/5 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-comments text-emerald dark:text-gold"></i></div><h3 class="font-display font-semibold mb-1 text-ink dark:text-white text-sm">Тамос мустақим</h3><p class="text-stone dark:text-gray-400 text-xs">Бо соҳибхона мустақиман паём.</p></div>
+                <div class="reveal in"><div class="w-14 h-14 rounded-full bg-cream dark:bg-white/5 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-map-location-dot text-emerald dark:text-gold"></i></div><h3 class="font-display font-semibold mb-1 text-ink dark:text-white text-sm">Пӯшиши васеъ</h3><p class="text-stone dark:text-gray-400 text-xs">Даҳҳо шаҳри Тоҷикистон.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ LATEST PROPERTIES ============ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="flex items-end justify-between mb-10 flex-wrap gap-3">
+            <h2 class="reveal in font-display text-2xl sm:text-3xl font-bold text-ink dark:text-white" data-lang="sections_title">Амволҳои охирин</h2>
+            <a href="/search/" class="reveal in underline-grow text-emerald dark:text-gold font-semibold text-sm">Ҳамаро дидан &rarr;</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-16 bg-white dark:bg-white/5 rounded-2xl border border-dashed border-ink/10 dark:border-white/10">
+                <i class="fa-regular fa-folder-open text-4xl text-stone/40 dark:text-gray-600 mb-4"></i>
+                <p class="text-stone dark:text-gray-400 text-lg" data-lang="no_properties">Ҳеҷ амволе ёфт нашуд.</p>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- ============ TESTIMONIALS ============ -->
+    <div class="bg-white dark:bg-darkbg-card py-16 border-t border-ink/5 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="reveal in text-center max-w-xl mx-auto mb-12">
+                <p class="text-gold text-xs font-semibold uppercase tracking-[0.2em] mb-2">Фикри муштариён</p>
+                <h2 class="font-display text-2xl sm:text-3xl font-bold text-ink dark:text-white">Ба мо чӣ мегӯянд</h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <blockquote class="reveal in card-hover bg-cream dark:bg-white/5 rounded-2xl p-8"><i class="fa-solid fa-quote-left text-gold text-xl mb-4"></i><p class="text-ink/70 dark:text-gray-300 text-sm leading-relaxed mb-6">Дар як ҳафта хонаи мувофиқ ёфтам.</p><footer class="font-display font-semibold text-sm text-ink dark:text-white">Ф. Раҳимов</footer></blockquote>
+                <blockquote class="reveal in card-hover bg-cream dark:bg-white/5 rounded-2xl p-8"><i class="fa-solid fa-quote-left text-gold text-xl mb-4"></i><p class="text-ink/70 dark:text-gray-300 text-sm leading-relaxed mb-6">Гузоштани эълон хеле осон буд.</p><footer class="font-display font-semibold text-sm text-ink dark:text-white">М. Каримова</footer></blockquote>
+                <blockquote class="reveal in card-hover bg-cream dark:bg-white/5 rounded-2xl p-8"><i class="fa-solid fa-quote-left text-gold text-xl mb-4"></i><p class="text-ink/70 dark:text-gray-300 text-sm leading-relaxed mb-6">Дизайни сайт равшан ва зебо аст.</p><footer class="font-display font-semibold text-sm text-ink dark:text-white">С. Назаров</footer></blockquote>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ CTA ============ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="reveal in rounded-2xl bg-emerald px-8 py-16 text-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-[0.07]" style="background-image: radial-gradient(circle at 25% 30%, #C9A24B 0%, transparent 45%);"></div>
+            <h2 class="font-display text-white text-2xl sm:text-3xl font-bold max-w-xl mx-auto relative">Хонаи навбатии худро имрӯз ёбед</h2>
+            <p class="text-white/70 mt-4 max-w-md mx-auto relative text-sm">Ба ҳазорон корбари Comfort Home ҳамроҳ шавед.</p>
+            <div class="flex flex-wrap items-center justify-center gap-4 mt-8 relative">
+                <a href="/search/" class="rounded-lg bg-gold hover:bg-gold-dark text-white font-display font-semibold px-8 py-3.5 transition" data-lang="search_btn">Ҷустуҷӯи амвол</a>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Count-up (маҳз барои шумораҳои сарлавҳа)
+        document.querySelectorAll('[data-count-to]').forEach((el) => {
+            const target = parseInt(el.dataset.countTo, 10) || 0;
+            const cio = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    const start = performance.now();
+                    const step = (now) => {
+                        const p = Math.min((now - start) / 1000, 1);
+                        el.textContent = Math.floor(p * target);
+                        if (p < 1) requestAnimationFrame(step); else el.textContent = target;
+                    };
+                    requestAnimationFrame(step);
+                    cio.unobserve(el);
+                });
+            }, { threshold: 0.5 });
+            cio.observe(el);
+        });
+    </script>
+
+
+    </main>
+
+    <footer class="bg-ink dark:bg-darkbg-card text-white mt-16">
+    <div class="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div>
+            <h2 class="text-2xl font-display font-bold text-white mb-4">Comfort <span class="text-gold">Home</span></h2>
+            <p data-lang="footer_desc" class="text-white/50 text-sm">
+                Беҳтарин платформа барои ҷустуҷӯ ва дарёфти амволи ғайриманқул дар Тоҷикистон.
+            </p>
+        </div>
+
+        <div>
+            <h3 data-lang="footer_links" class="text-sm font-display font-semibold text-white mb-4 uppercase tracking-wide">Истинодҳо</h3>
+            <ul class="space-y-2 text-white/50 text-sm">
+                <li><a href="/" data-lang="home_page" class="hover:text-gold transition">Саҳифаи асосӣ</a></li>
+                <li><a href="/about/" data-lang="terms_of_use" class="hover:text-gold transition">Дар бораи мо</a></li>
+            </ul>
+        </div>
+        <div>
+            
+            <div class="space-y-3 text-white/50 text-sm">
+                <h3 data-lang="footer_contact" class="text-sm font-display font-semibold text-white mb-4 uppercase tracking-wide">Тамос бо мо</h3>
+            <p data-lang="footer_rights" class="text-white/30 text-xs mt-8">&copy; 2026 Comfort Home . Ҳамаи ҳуқуқҳо ҳифз шудаанд.</p>
+                <p class="flex items-center gap-2">
+                    <i class="fa-solid fa-envelope text-gold"></i> -info@comforthome.tj
+                </p>
+                <div class="flex gap-3 mt-4">
+                    <a href="#" aria-label="WhatsApp" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-gold hover:text-gold hover:-translate-y-0.5 transition"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Telegram" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-gold hover:text-gold hover:-translate-y-0.5 transition"><i class="fa-brands fa-telegram" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-gold hover:text-gold hover:-translate-y-0.5 transition"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+
+    
+    </div>
+</footer>
+
+    
+    <!-- ============ AI ASSISTANT WIDGET ============ -->
+    <button id="chat-btn" type="button" aria-label="Кушодани ёрдамчии AI" aria-expanded="false" aria-controls="chat-window"
+        class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full gradient-btn glow-shadow text-white flex items-center justify-center text-xl transition active:scale-95">
+        <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+    </button>
+
+    <div id="chat-window" role="dialog" aria-modal="false" aria-label="Ёрдамчии AI" class="hidden fixed bottom-24 right-5 sm:right-6 z-50 w-[92vw] max-w-sm bg-white dark:bg-darkbg-card rounded-2xl shadow-lifted border border-ink/5 dark:border-white/10 overflow-hidden flex flex-col" style="max-height: 70vh;">
+        <div class="flex items-center justify-between px-5 py-4 bg-emerald text-white shrink-0">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-sparkles text-gold" aria-hidden="true"></i>
+                <h2 data-lang="chat_title" class="font-display font-semibold text-sm">Ёрдамчии AI</h2>
+            </div>
+            <button id="chat-close-btn" type="button" aria-label="Пӯшидани ёрдамчии AI" class="p-1.5 rounded-lg hover:bg-white/10 transition">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div id="chat-body" class="flex-grow overflow-y-auto px-4 py-4 space-y-3 text-sm bg-cream dark:bg-white/5">
+            <p data-lang="chat_empty" class="text-stone dark:text-gray-400 text-xs italic">Саволи худро дар бораи амволҳо бипурсед.</p>
+        </div>
+        <form id="chat-form" onsubmit="event.preventDefault(); document.getElementById('send-btn').click();" class="flex items-center gap-2 p-3 border-t border-ink/5 dark:border-white/10 bg-white dark:bg-darkbg-card shrink-0">
+            <label for="chat-input" class="sr-only">Паём</label>
+            <input id="chat-input" type="text" autocomplete="off" data-lang-placeholder="chat_placeholder" placeholder="Паёми худро нависед..."
+                class="flex-grow px-3 py-2 rounded-lg border border-ink/10 dark:border-white/10 bg-cream dark:bg-white/5 dark:text-white text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition">
+            <button id="send-btn" type="button" data-lang="chat_send" aria-label="Фиристодани паём" class="gradient-btn text-white px-4 py-2 rounded-lg text-sm font-display font-semibold transition active:scale-95">Фиристодан</button>
+        </form>
+    </div>
+    
+
+    <script>
+
+    const translations = {
+
+        tg: {
+
+            favorites_btn: "Маҳбубҳо",
+
+            nav_home: "Асосӣ",
+
+            nav_about: "Дар бораи мо",
+
+            nav_properties: "Амволҳо",
+
+            nav_add: "Эълон +",
+
+            nav_logout: "Хурӯҷ",
+
+            nav_login: "Вуруд",
+
+            nav_register: "Сабти ном",
+
+            footer_text: "Ҳамаи ҳуқуқҳо ҳифз шудаанд.",
+
+            hero_title: "Хонаи орзуҳои худро бо Comfort Home пайдо кунед",
+
+            hero_sub: "Беҳтарин амволҳо ва хонаҳо барои иҷора  дар Тоҷикистон.",
+
+            search_btn: "Ҷустуҷӯ",
+
+            sections_title: "Амволҳои охирин",
+
+            rooms: "Ҳуҷраҳо *",
+
+            area: "Масоҳат (м²) *",
+
+            details: "Муфассал",
+
+            no_properties: "Ҳеҷ амволе ёфт нашуд.",
+
+            about_title: "Дар бораи Comfort Home",
+
+            about_subtitle: "Мо ба шумо барои пайдо кардани беҳтарин ва қулайтарин хонаҳо ва амволҳо дар Тоҷикистон кӯмак мерасонем.",
+
+            stat_clients: "Мизоҷони қаноатманд",
+
+            stat_properties: "Амволҳои фаъол",
+
+            stat_years: "Сол таҷриба",
+
+            about_why_title: "Чаро маҳз мо?",
+
+            about_why_text: "Платформаи мо ба соҳибони амвол имкон медиҳад, ки эълонҳои худро зуд ҷойгир кунанд, ва ба иҷорагирон имкон медиҳад, ки хонаи дилхоҳашонро пайдо кунанд.",
+
+            about_f1_title: "Амнияти Пурра",
+
+            about_f1_text: "Ҳамаи соҳибони амвол ва эълонҳо санҷида мешаванд.",
+
+            search_res_title: "Натиҷаҳои ҷустуҷӯ",
+
+            owner: "Соҳибмулк",
+
+            description: "Тавсиф",
+            address_details: "Сурогаи пурра",
+            amenities:"Имконот",
+
+            my_prop_title: "Эълонҳои ман",
+
+            table_title: "Ном *",
+
+            table_price: "Нарх (TJS) *",
+
+            table_city: "Шаҳр",
+
+            table_actions: "Амалҳо",
+
+            form_prop_title: "Формаи амвол",
+
+            save_btn: "Захира кардан",
+
+            delete_title: "Тасдиқи несткунӣ",
+
+            delete_sub: "Оё шумо мутмаин ҳастед?",
+
+            cancel_btn: "Бекор кардан",
+
+            select_prop: "Интихоби амвол",
+
+            select_file: "Суратро интихоб кунед",
+
+            logout_btn: "Баромад",
+
+           
+
+            // НАВ:
+
+            label_type: "Намуди амвол *",
+
+            opt_select: "Интихоб кунед",
+
+            opt_apartment: "Квартира",
+
+            opt_house: "Ҳавлигӣ",
+
+            opt_commercial: "Тиҷоратӣ",
+
+            label_district: "Ноҳия *",
+
+            label_address: "Суроғаи дақиқ *",
+
+            label_amenities: "Шароитҳо *",
+
+            label_available: "Барои иҷора/фурӯш омода аст",
+
+
+
+            label_location: "Ҷойгиршавӣ",
+
+            label_price_from: "Нарх аз (TJS)",
+
+            label_price_to: "Нарх то (TJS)",
+
+            my_ad: "Эълони ман",
+
+            edit_btn: "Таҳрир",
+
+            delete_btn: "Нест кардан",
+
+            contact_owner: "Тамос бо соҳибхона",
+
+            no_phone: "Рақами телефон мавҷуд нест",
+
+            footer_desc: "Беҳтарин платформа барои ҷустуҷӯ ва дарёфти амволи ғайриманқул дар Тоҷикистон.",
+
+            footer_links: "Истинодҳо",
+
+            home_page: "Саҳифаи асосӣ",
+
+            terms_of_use: "Дар бораи мо",
+
+            footer_contact: "Тамос бо мо",
+
+            footer_rights: "2026 Comfort Home. Ҳамаи ҳуқуқҳо ҳифз шудаанд.",
+
+            add_images: " Иловаи сурат +",
+
+            floor:"Ошёна",
+
+
+
+            login_h2: "Вуруд ба система",
+
+            login_user: "Номи корбарӣ ё Email",
+
+            login_pass: "Парол",
+
+            login_btn: "Вуруд",
+
+
+
+            error_invalid_credentials: "Номи корбар ё рамз нодуруст аст!",
+
+            error_not_active: "Аввал почтаи худро тасдиқ кунед!",
+
+
+
+            nav_register: "Сабти ном",
+
+
+
+            fav_sub_title: "Рӯйхати амволҳое, ки ба шумо писанд омадаанд.",
+
+            no_fav_properties: "Шумо ҳеҷ амволеро ба маҳбубҳо илова накардаед.",
+
+            back_to_home: "Саҳифаи асосӣ",
+
+            reg_h2: "Сабти ном",
+            reg_role: "Нақш (Мақсад)",
+            reg_pass2: "Такрори парол",
+            reg_btn: "Сабти ном",
+
+            conf_h2: "Тасдиқи почтаи электронӣ",
+            conf_sub: "Лутфан коди ба почтаи шумо фиристодашударо ворид кунед.",
+            conf_btn: "Тасдиқ кардан",
+
+            confirm_btn: "Нест кардан",
+            img_add_btn: "Иловаи сурат",
+            stat_properties_short: "амвол ёфт шуд",
+
+            chat_title: "Ёрдамчии AI",
+            chat_placeholder: "Паёми худро нависед...",
+            chat_send: "Фиристодан",
+            chat_you: "Шумо",
+            chat_ai: "AI",
+            chat_empty: "Саволи худро дар бораи амволҳо бипурсед.",
+            chat_open: "Кушодани ёрдамчии AI",
+            chat_close: "Пӯшидани ёрдамчии AI",
+
+            fav_toggle_add: "Илова ба маҳбубҳо",
+            fav_toggle_remove: "Маҳбубҳо (Нест кардан)",
+            login_to_save: "Барои маҳфуз кардан ворид шавед"
+
+        },
+
+        ru: {
+
+            favorites_btn: "Избранное",
+
+            nav_home: "Главная",
+
+            nav_about: "О нас",
+
+            nav_properties: "Недвижимость",
+
+            nav_add: "Объявление +",
+
+            nav_logout: "Выход",
+
+            nav_login: "Вход",
+
+            nav_register: "Регистрация",
+
+            footer_text: "Все права защищены.",
+
+            hero_title: "Найдите дом своей мечты с Comfort Home",
+
+            hero_sub: "Лучшая недвижимость для аренды в Таджикистане.",
+
+            search_btn: "Поиск",
+
+            sections_title: "Последние объявления",
+
+            rooms: "Комнаты *",
+
+            area: "Площадь (м²) *",
+
+            details: "Подробнее",
+
+            no_properties: "Объявлений не найдено.",
+
+            about_title: "О компании Comfort Home",
+
+            about_subtitle: "Мы помогаем вам найти лучшие и самые удобные дома и объекты недвижимости в Таджикистане.",
+
+            stat_clients: "Довольных клиентов",
+
+            stat_properties: "Активных объектов",
+
+            stat_years: "Лет опыта",
+
+            about_why_title: "Почему именно мы?",
+
+            about_why_text: "Наша платформа позволяет владельцам недвижимости быстро размещать объявления, а арендаторам — находить дом своей мечты.",
+
+            about_f1_title: "Полная Безопасность",
+
+            about_f1_text: "Все владельцы и объявления проверяются вручную.",
+
+            search_res_title: "Результаты поиска",
+
+            owner: "Собственник",
+
+            description: "Описание",
+            address_details: "Адресс",
+
+            my_prop_title: "Мои объявления",
+
+            table_title: "Название *",
+
+            table_price: "Цена (TJS) *",
+
+            table_city: "Город",
+
+            table_actions: "Действия",
+
+            form_prop_title: "Форма объявления",
+
+            save_btn: "Сохранить",
+
+            delete_title: "Подтверждение удаления",
+
+            delete_sub: "Вы уверены?",
+
+            cancel_btn: "Отмена",
+
+            select_prop: "Выберите объект",
+
+            select_file: "Выберите фото",
+
+            logout_btn: "Выход",
+
+            amenities:"Имконот",
+
+           
+
+            // НАВ:
+
+            label_type: "Тип недвижимости *",
+
+            opt_select: "Выберите",
+
+            opt_apartment: "Квартира",
+
+            opt_house: "Дом / Участок",
+
+            opt_commercial: "Коммерческая",
+
+            label_district: "Район *",
+
+            label_address: "Точный адрес *",
+
+            label_amenities: "Удобства *",
+
+            label_available: "Доступно для аренды/продажи",
+
+
+
+            label_location: "Местоположение",
+
+            label_price_from: "Цена от (TJS)",
+
+            label_price_to: "Цена до (TJS)",
+
+            my_ad: "Моё объявление",
+
+            edit_btn: "Редактировать",
+
+            delete_btn: "Удалить",
+
+            contact_owner: "Связаться с владельцем",
+
+            no_phone: "Номер телефона не указан",
+
+            footer_desc: "Лучшая платформа для поиска и покупки недвижимости в Таджикистане.",
+
+            footer_links: "Ссылки",
+
+            home_page: "Главная страница",
+
+            terms_of_use: "О нас",
+
+            footer_contact: "Свяжитесь с нами",
+
+            footer_rights: "2026 Comfort Home. Все права защищены.",
+
+            add_images: "Добавить фото +",
+
+
+
+            login_h2: "Вход в систему",
+
+            login_user: "Имя пользователя или Email",
+
+            login_pass: "Пароль",
+
+            login_btn: "Войти",
+
+
+
+            error_invalid_credentials: "Неверное имя пользователя или пароль!",
+
+            error_not_active: "Пожалуйста, подтвердите вашу почту!",
+
+            floor:"Этаж",
+
+
+
+            nav_register: "Регистрация",
+
+
+
+            fav_sub_title: "Список объектов недвижимости, которые вам понравились.",
+
+            no_fav_properties: "Вы не добавили ни одного объекта в избранное.",
+
+            back_to_home: "На главную",
+
+            reg_h2: "Регистрация",
+            reg_role: "Роль (Статус)",
+            reg_pass2: "Повторите пароль",
+            reg_btn: "Зарегистрироваться",
+
+            conf_h2: "Подтверждение почты",
+            conf_sub: "Пожалуйста, введите код, отправленный на вашу почту.",
+            conf_btn: "Подтвердить",
+
+            confirm_btn: "Удалить",
+            img_add_btn: "Добавить фото",
+            stat_properties_short: "объектов найдено",
+
+            chat_title: "AI-ассистент",
+            chat_placeholder: "Напишите сообщение...",
+            chat_send: "Отправить",
+            chat_you: "Вы",
+            chat_ai: "AI",
+            chat_empty: "Задайте вопрос о недвижимости.",
+            chat_open: "Открыть AI-ассистента",
+            chat_close: "Закрыть AI-ассистента",
+
+            fav_toggle_add: "Добавить в избранное",
+            fav_toggle_remove: "Избранное (Удалить)",
+            login_to_save: "Войдите, чтобы сохранить"
+
+        },
+
+        en: {
+
+            favorites_btn: "Favorites",
+
+            nav_home: "Home",
+
+            nav_about: "About Us",
+
+            nav_properties: "Properties",
+
+            nav_add: "Add Post +",
+
+            nav_logout: "Logout",
+
+            nav_login: "Login",
+
+            nav_register: "Register",
+
+            footer_text: "All rights reserved.",
+
+            hero_title: "Find Your Dream Home with Comfort Home",
+
+            hero_sub: "The best real estate and apartments for rent  in Tajikistan.",
+
+            search_btn: "Search",
+
+            sections_title: "Latest Properties",
+
+            rooms: "Rooms *",
+
+            area: "Area (m²) *",
+
+            details: "Details",
+
+            no_properties: "No properties found.",
+
+            about_title: "About Comfort Home",
+
+            about_subtitle: "We help you find the best and most comfortable homes and properties in Tajikistan.",
+
+            stat_clients: "Satisfied Clients",
+
+            stat_properties: "Active Properties",
+
+            stat_years: "Years of Experience",
+
+            about_why_title: "Why Choose Us?",
+
+            about_why_text: "Our platform allows property owners to list their properties quickly, and helps tenants find the home of their dreams.",
+
+            about_f1_title: "Full Security",
+
+            about_f1_text: "All property owners and listings are verified.",
+
+            search_res_title: "Search Results",
+
+            owner: "Owner",
+
+            description: "Description",
+            address_details: "Address_details",
+
+            my_prop_title: "My Listings",
+
+            table_title: "Title *",
+
+            table_price: "Price (TJS) *",
+
+            table_city: "City",
+
+            table_actions: "Actions",
+
+            form_prop_title: "Property Form",
+
+            save_btn: "Save",
+
+            delete_title: "Confirm Delete",
+
+            delete_sub: "Are you absolutely sure?",
+
+            cancel_btn: "Cancel",
+
+            select_prop: "Select Property",
+
+            select_file: "Choose Image File",
+
+            logout_btn: "Logout",
+
+           
+
+            // НАВ:
+
+            label_type: "Property Type *",
+
+            opt_select: "Select",
+
+            opt_apartment: "Apartment",
+
+            opt_house: "House",
+
+            opt_commercial: "Commercial",
+
+            label_district: "District *",
+
+            label_address: "Exact Address *",
+
+            label_amenities: "Amenities *",
+
+            label_available: "Available for rent/sale",
+
+            contact_owner: "Contact Owner",
+
+            no_phone: "Phone number not provided",
+
+
+
+            label_location: "Location",
+
+            label_price_from: "Price from (TJS)",
+
+            label_price_to: "Price to (TJS)",
+
+            my_ad: "My ad",
+
+            edit_btn: "Edit",
+
+            delete_btn: "Delete",
+
+            amenities:"Amenities",
+
+
+
+            footer_desc: "The best platform for searching and buying real estate in Tajikistan.",
+
+            footer_links: "Links",
+
+            home_page: "Home Page",
+
+            terms_of_use: "About Us",
+
+            footer_contact: "Contact Us",
+
+            footer_rights: "2026 Comfort Home. All rights reserved.",
+
+            add_images: "Add photo +",
+
+
+
+            login_h2: "Sign In",
+
+            login_user: "Username or Email",
+
+            login_pass: "Password",
+
+            login_btn: "Login",
+
+
+
+            error_invalid_credentials: "Invalid username or password!",
+
+            error_not_active: "Please verify your email!",
+
+            floor:"floor",
+
+
+
+            nav_register: "Register",
+
+
+
+            fav_sub_title: "List of properties that you liked.",
+
+            no_fav_properties: "You have not added any properties to your favorites.",
+
+            back_to_home: "Back to Home",
+
+            reg_h2: "Create Account",
+            reg_role: "I am a...",
+            reg_pass2: "Confirm Password",
+            reg_btn: "Register",
+
+            conf_h2: "Confirm Your Email",
+            conf_sub: "Please enter the code sent to your email.",
+            conf_btn: "Confirm",
+
+            confirm_btn: "Delete",
+            img_add_btn: "Add Photo",
+            stat_properties_short: "properties found",
+
+            chat_title: "AI Assistant",
+            chat_placeholder: "Type your message...",
+            chat_send: "Send",
+            chat_you: "You",
+            chat_ai: "AI",
+            chat_empty: "Ask a question about our properties.",
+            chat_open: "Open AI assistant",
+            chat_close: "Close AI assistant",
+
+            fav_toggle_add: "Add to Favorites",
+            fav_toggle_remove: "Favorited (Remove)",
+            login_to_save: "Log in to save"
+
+        }
+
+    };
+
+
+
+    function applyTranslations() {
+
+        const lang = localStorage.getItem('selectedLang') || 'tg';
+
+        document.getElementById('langSelector').value = lang;
+
+
+
+        document.querySelectorAll('[data-lang]').forEach(element => {
+
+            const key = element.getAttribute('data-lang');
+
+            if (translations[lang] && translations[lang][key]) {
+
+                element.innerText = translations[lang][key];
+
+            }
+
+        });
+
+        document.querySelectorAll('[data-lang-placeholder]').forEach(element => {
+            const key = element.getAttribute('data-lang-placeholder');
+            if (translations[lang] && translations[lang][key]) {
+                element.setAttribute('placeholder', translations[lang][key]);
+            }
+        });
+
+    }
+
+
+
+    document.getElementById('langSelector').addEventListener('change', (e) => {
+
+        localStorage.setItem('selectedLang', e.target.value);
+
+        applyTranslations();
+
+    });
+
+
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+        applyTranslations();
+
+    });
+
+
+
+    // ---------- Тугмаи иваз кардани реҷими торик/рӯшан (ЯГОНА listener) ----------
+    const toggleBtn = document.getElementById('theme-toggle');
+
+    toggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+
+        if (document.documentElement.classList.contains('dark')) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
+    // Виҷети ёрдамчии AI — танҳо барои корбарони воридшуда рендер мешавад,
+    // бинобар ин пеш аз пайваст кардани listener-ҳо мавҷудияти онро месанҷем.
+    const chatBtn = document.getElementById('chat-btn');
+    const chatWindow = document.getElementById('chat-window');
+    const chatCloseBtn = document.getElementById('chat-close-btn');
+    const sendBtn = document.getElementById('send-btn');
+    const input = document.getElementById('chat-input');
+    const chatBody = document.getElementById('chat-body');
+
+    if (chatBtn && chatWindow && sendBtn && input && chatBody) {
+        const escapeHtml = (str) => str.replace(/[&<>"']/g, (ch) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        }[ch]));
+
+        const setChatOpen = (open) => {
+            chatWindow.classList.toggle('hidden', !open);
+            chatBtn.setAttribute('aria-expanded', String(open));
+            if (open) input.focus();
+        };
+
+        chatBtn.addEventListener('click', () => setChatOpen(chatWindow.classList.contains('hidden')));
+        if (chatCloseBtn) chatCloseBtn.addEventListener('click', () => setChatOpen(false));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !chatWindow.classList.contains('hidden')) setChatOpen(false);
+        });
+
+        sendBtn.addEventListener('click', async () => {
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const lang = localStorage.getItem('selectedLang') || 'tg';
+            const youLabel = (translations[lang] && translations[lang].chat_you) || 'Шумо';
+            const aiLabel = (translations[lang] && translations[lang].chat_ai) || 'AI';
+
+            chatBody.insertAdjacentHTML('beforeend', `<div class="text-right"><span class="inline-block bg-emerald text-white rounded-lg px-3 py-1.5 text-xs"><strong>${youLabel}:</strong> ${escapeHtml(msg)}</span></div>`);
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+                const response = await fetch('/ask-groq/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: msg})
+                });
+                const data = await response.json();
+                chatBody.insertAdjacentHTML('beforeend', `<div class="text-left"><span class="inline-block bg-white dark:bg-white/10 border border-ink/5 dark:border-white/10 rounded-lg px-3 py-1.5 text-xs text-ink dark:text-gray-100"><strong class="text-emerald dark:text-gold">${aiLabel}:</strong> ${escapeHtml(String(data.response ?? ''))}</span></div>`);
+            } catch (err) {
+                chatBody.insertAdjacentHTML('beforeend', `<div class="text-left"><span class="inline-block bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-300 rounded-lg px-3 py-1.5 text-xs">${aiLabel}: —</span></div>`);
+            }
+            chatBody.scrollTop = chatBody.scrollHeight;
+        });
+    }
+
+</script>
+</body>
+</html>
