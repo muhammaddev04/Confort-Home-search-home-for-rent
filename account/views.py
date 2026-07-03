@@ -10,7 +10,7 @@ from .models import EmailConfirm, User
 
 
 def send_email_confirmation(user):
-    code = randint(100000, 999999)
+    code = randint(1000, 9999)
     EmailConfirm.objects.update_or_create(
         user=user,
         defaults={'code': str(code)}
