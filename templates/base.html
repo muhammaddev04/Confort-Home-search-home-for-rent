@@ -1134,6 +1134,48 @@
 
     };
 
+     function updateAllTranslations(root) {
+        root = root || document;
+        const lang = (localStorage.getItem('selectedLang') || 'tg').toLowerCase();
+        const dict = translations[lang] || translations.tg;
+
+        const applyToAttr = (selector, apply) => {
+            root.querySelectorAll(selector).forEach((element) => {
+                const key = element.getAttribute(selector.match(/\[([^\]]+)\]/)[1]);
+                if (!key) return;
+                const text = dict[key];
+                if (typeof text === 'string') apply(element, text);
+            });
+        };
+
+        applyToAttr('[data-lang]:not([data-lang-count])', (el, text) => { el.textContent = text; });
+        applyToAttr('[data-lang-placeholder]', (el, text) => { el.placeholder = text; });
+        applyToAttr('[data-lang-title]', (el, text) => { el.title = text; });
+        applyToAttr('[data-lang-value]', (el, text) => { el.value = text; });
+
+        // data-lang-count — барои ҷумлаҳое, ки шумора доранд (масалан "дар асоси {n} эълон"):
+        // {n} дар матни тарҷумашуда бо арзиши атрибут иваз мешавад.
+        root.querySelectorAll('[data-lang][data-lang-count]').forEach((element) => {
+            const key = element.getAttribute('data-lang');
+            const text = dict[key];
+            if (typeof text === 'string') {
+                element.textContent = text.replace('{n}', element.getAttribute('data-lang-count'));
+            }
+        });
+
+        return dict;
+    }
+    window.updateAllTranslations = updateAllTranslations;
+
+    // escapeHtml — саросарӣ, барои дар бехатарӣ гузоштани маълумоти корбарӣ/берунӣ
+    // ба innerHTML (пешгирии XSS дар чат ва ҷадвали муқоиса).
+    function escapeHtml(str) {
+        return String(str).replace(/[&<>"']/g, (ch) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        }[ch]));
+    }
+    window.escapeHtml = escapeHtml;
+
 </script>
 </body>
 </html>
