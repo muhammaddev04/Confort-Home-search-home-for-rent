@@ -6,4 +6,5 @@ urlpatterns = [
     path('confirm/', views.confirm_email, name='confirm_email'),
     path('resend-confirmation/', views.resend_confirmation, name='resend_confirmation'),
     path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 ]
