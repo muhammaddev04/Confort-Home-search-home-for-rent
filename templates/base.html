@@ -1371,8 +1371,77 @@
         changeLanguage(localStorage.getItem('selectedLang') || 'tg');
     });
 
+    const toggleBtn = document.getElementById('theme-toggle');
 
+    toggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
 
+        if (document.documentElement.classList.contains('dark')) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
+    // Виҷети ёрдамчии AI — танҳо барои корбарони воридшуда рендер мешавад,
+    // бинобар ин пеш аз пайваст кардани listener-ҳо мавҷудияти онро месанҷем.
+    const chatBtn = document.getElementById('chat-btn');
+    const chatWindow = document.getElementById('chat-window');
+    const chatCloseBtn = document.getElementById('chat-close-btn');
+    const sendBtn = document.getElementById('send-btn');
+    const input = document.getElementById('chat-input');
+    const chatBody = document.getElementById('chat-body');
+
+    if (chatBtn && chatWindow && sendBtn && input && chatBody) {
+        const getCsrfToken = () => {
+            const match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+            return match ? decodeURIComponent(match[1]) : '';
+        };
+
+        const setChatOpen = (open) => {
+            chatWindow.classList.toggle('hidden', !open);
+            chatBtn.setAttribute('aria-expanded', String(open));
+            if (open) input.focus();
+        };
+
+        chatBtn.addEventListener('click', () => setChatOpen(chatWindow.classList.contains('hidden')));
+        if (chatCloseBtn) chatCloseBtn.addEventListener('click', () => setChatOpen(false));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !chatWindow.classList.contains('hidden')) setChatOpen(false);
+        });
+
+        sendBtn.addEventListener('click', async () => {
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const lang = localStorage.getItem('selectedLang') || 'tg';
+            const youLabel = (translations[lang] && translations[lang].chat_you) || 'Шумо';
+            const aiLabel = (translations[lang] && translations[lang].chat_ai) || 'AI';
+
+            chatBody.insertAdjacentHTML('beforeend', `<div class="text-right"><span class="inline-block bg-emerald text-white rounded-lg px-3 py-1.5 text-xs"><strong>${youLabel}:</strong> ${escapeHtml(msg)}</span></div>`);
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+                const response = await fetch('/ask-groq/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken(),
+                    },
+                    body: JSON.stringify({message: msg, lang: lang})
+                });
+                const data = await response.json();
+                chatBody.insertAdjacentHTML('beforeend', `<div class="text-left"><span class="inline-block bg-white dark:bg-white/10 border border-ink/5 dark:border-white/10 rounded-lg px-3 py-1.5 text-xs text-ink dark:text-gray-100"><strong class="text-emerald dark:text-gold">${aiLabel}:</strong> ${escapeHtml(String(data.response ?? ''))}</span></div>`);
+            } catch (err) {
+                chatBody.insertAdjacentHTML('beforeend', `<div class="text-left"><span class="inline-block bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-300 rounded-lg px-3 py-1.5 text-xs">${aiLabel}: —</span></div>`);
+            }
+            chatBody.scrollTop = chatBody.scrollHeight;
+            // Маҳтавои нав ба чат илова шуд — агар дар оянда дар он [data-lang]
+            // элементҳо бошанд (масалан тугмаҳои амал дар посухи AI), тарҷума мешаванд.
+            window.updateAllTranslations(chatBody);
+        });
+    }
 
 </script>
 </body>
