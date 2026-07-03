@@ -296,3 +296,25 @@ def properties_map_data(request):
         for p in propertys
     ]
     return JsonResponse({'properties': data})
+
+
+@login_required
+def property_list(request):
+
+    if not request.user.is_authenticated or request.user.role not in ('landlord', 'admin'):
+        return redirect('home')
+   
+    propertys = Property.objects.filter(owner=request.user)
+
+   
+    city = request.GET.get('q')
+    if city and isinstance(city, str):
+        propertys = propertys.filter(city__icontains=city.strip())
+
+    district = request.GET.get('qu')
+    if district and isinstance(district, str):
+        propertys = propertys.filter(district__icontains=district.strip())
+
+   
+    return render(request, 'property_search.html', {'propertys': propertys})
+
