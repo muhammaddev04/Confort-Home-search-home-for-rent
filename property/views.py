@@ -22,7 +22,9 @@ load_dotenv()
 
 AI_RATE_LIMIT = 15
 AI_RATE_WINDOW = 60  
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 api_key=GROQ_API_KEY
+
 
 
 
@@ -86,7 +88,7 @@ def properties_map_data(request):
 
 
 
-class HomeView(LoginRequiredMixin, ListView):
+class HomeView(ListView):
     model = Property
     template_name = 'home.html'
     context_object_name = 'propertys'
@@ -109,9 +111,12 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['favorite_property_ids'] = Favorite.objects.filter(
-            user=self.request.user
-        ).values_list('property_id', flat=True)
+        if self.request.user.is_authenticated:
+            context['favorite_property_ids'] = Favorite.objects.filter(
+                user=self.request.user
+            ).values_list('property_id', flat=True)
+        else:
+            context['favorite_property_ids'] = []
         return context
 
 

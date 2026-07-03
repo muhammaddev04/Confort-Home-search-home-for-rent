@@ -113,7 +113,6 @@ def resend_confirmation(request):
 
     return render(request, 'confirm.html')
 
-@login_required
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
