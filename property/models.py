@@ -28,3 +28,10 @@ class Property(models.Model):
     def __str__(self):
         return f'{self.title} — {self.price} TJS'
 
+
+class Property_Image(models.Model):
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='property_images/', null=True, blank=True)
+
+    def __str__(self):
+        return f"Image for {self.property.title}"
