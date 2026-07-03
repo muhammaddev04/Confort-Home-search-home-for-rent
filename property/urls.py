@@ -17,4 +17,5 @@ urlpatterns = [
     path('update-propertyimages/<int:pk>/', views.update_propertyimage, name='update_propertyimages'),
     path('delete-propertyimages/<int:pk>/', views.delete_propertyimage, name='delete_propertyimages'),
     path('favorites/', views.favorite_list, name='favorite_list'),
+    path('toggle-favorite/<int:pk>/', views.toggle_favorite, name='toggle_favorite'),
 ]

@@ -448,3 +448,25 @@ def favorite_list(request):
     return render(request, 'favorites_list.html', {
         'favorite_properties': favorite_properties
     })
+
+
+@login_required
+def toggle_favorite(request, pk):
+    if request.method == 'POST':
+        property_obj = get_object_or_404(Property, pk=pk)
+        favorite, created = Favorite.objects.get_or_create(user=request.user, property=property_obj)
+        
+        if not created:
+            favorite.delete()
+            status = 'removed'
+        else:
+            status = 'added'
+            
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'status': status})
+            
+        
+        return redirect(request.META.get('HTTP_REFERER', 'home'))
+        
+    return redirect('home')
