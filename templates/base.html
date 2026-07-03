@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Comfort Home{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&subset=cyrillic&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind config — бояд ҳамин ҷо, пеш аз рендери HTML бимонад
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#EAF3EF',
+                            100: '#D2E6DC',
+                            DEFAULT: '#0B3D2E',
+                            dark: '#C9A24B',
+                        },
+                        darkbg: {
+                            DEFAULT: '#0f172a',
+                            card: '#1e293b',
+                        },
+                        ink: '#1C1C1A',
+                        cream: '#FBF8F3',
+                        surface: '#F4EFE6',
+                        emerald: {
+                            DEFAULT: '#0B3D2E',
+                            mid: '#1F5C46',
+                        },
+                        gold: {
+                            DEFAULT: '#C9A24B',
+                            dark: '#B8923F',
+                        },
+                        accent: {
+                            DEFAULT: '#C9A24B',
+                            light: '#F3E7CC',
+                        },
+                        coral: '#C9A24B',
+                        saffron: '#C9A24B',
+                        pamir: '#178A56',
+                        stone: '#8B8378',
+                    },
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        soft: '0 20px 50px -25px rgba(11,61,46,0.25)',
+                        lifted: '0 30px 60px -20px rgba(11,61,46,0.35)',
+                    }
+                }
+            }
+        }
+
+        // Танзими аввалаи реҷим — пеш аз рендер, барои пешгирии "флэш"-и рӧшан пеш аз торикшавӣ
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .font-display{ font-family:'Playfair Display', serif; }
+        body{ font-family:'Inter', sans-serif; }
+
+        .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+        .reveal.in { opacity: 1; transform: translateY(0); }
+
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.3); }
+            60% { transform: scale(0.94); }
+            100% { transform: scale(1); }
+        }
+        .is-favorite i { animation: heartPop .4s ease; }
+
+        .card-hover { transition: transform .4s cubic-bezier(.22,.61,.36,1), box-shadow .4s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 24px 50px -22px rgba(11,61,46,0.28); }
+
+        .img-zoom { overflow: hidden; }
+        .img-zoom img { transition: transform .7s cubic-bezier(.22,.61,.36,1); }
+        .img-zoom:hover img { transform: scale(1.06); }
+
+        .underline-grow { position: relative; }
+        .underline-grow::after {
+            content: ''; position: absolute; left: 0; bottom: -3px; width: 0; height: 1px;
+            background: #C9A24B; transition: width .3s ease;
+        }
+        .underline-grow:hover::after { width: 100%; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+        }
+
+        /* ============ Comfort Home — shared component styles ============ */
+        .gradient-text {
+            background-image: linear-gradient(135deg, #0B3D2E 0%, #1F5C46 45%, #C9A24B 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .gradient-btn {
+            background-image: linear-gradient(135deg, #0B3D2E 0%, #1F5C46 100%);
+            transition: filter .3s ease, transform .3s ease, box-shadow .3s ease;
+        }
+        .gradient-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+        .glow-shadow { box-shadow: 0 18px 40px -18px rgba(201,162,75,0.45); }
+
+        /* Styling for Django's auto-rendered <input>/<select>/<textarea> widgets */
+        .dh-form input[type="text"],
+        .dh-form input[type="email"],
+        .dh-form input[type="number"],
+        .dh-form input[type="password"],
+        .dh-form input[type="tel"],
+        .dh-form input[type="file"],
+        .dh-form select,
+        .dh-form textarea {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(28,28,26,0.14);
+            background: #FBF8F3;
+            color: #1C1C1A;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .dark .dh-form input[type="text"],
+        .dark .dh-form input[type="email"],
+        .dark .dh-form input[type="number"],
+        .dark .dh-form input[type="password"],
+        .dark .dh-form input[type="tel"],
+        .dark .dh-form input[type="file"],
+        .dark .dh-form select,
+        .dark .dh-form textarea {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.12);
+            color: #ffffff;
+        }
+        .dh-form input:focus, .dh-form select:focus, .dh-form textarea:focus {
+            outline: none;
+            border-color: #C9A24B;
+            box-shadow: 0 0 0 3px rgba(201,162,75,0.22);
+        }
+        .dh-form input[type="checkbox"] { width: 1.15rem; height: 1.15rem; accent-color: #0B3D2E; cursor: pointer; }
+        .dh-form label { display: block; font-size: 0.8rem; font-weight: 600; color: #8B8378; text-transform: uppercase; letter-spacing: .02em; margin-bottom: 0.35rem; }
+        .dark .dh-form label { color: #9CA3AF; }
+
+        /* Keyboard-focus ring — visible only for keyboard navigation, not mouse clicks */
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+            outline: 2px solid #C9A24B;
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body class="bg-cream dark:bg-darkbg font-sans text-ink dark:text-gray-100 flex flex-col min-h-screen">
+
+    
+</body>
+</html>

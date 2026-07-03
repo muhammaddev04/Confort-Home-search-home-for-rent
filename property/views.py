@@ -484,4 +484,4 @@ def delete_favorite(request, pk):
 
 @login_required
 def landlord_dashboard(request):
-    return render(request, 'dashboard/landlord_dashboard.html')
+    return render(request, 'landlord_dashboard.html')
