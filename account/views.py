@@ -140,3 +140,28 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@login_required
+def profile_view(request):
+    if request.method == 'POST':
+        request.user.bio = request.POST.get('bio', request.user.bio)
+        request.user.phone_number = request.POST.get('phone_number', request.user.phone_number)
+
+        photo = request.FILES.get('photo')
+        if photo:
+            request.user.photo = photo
+
+        request.user.save()
+        flash.success(request, 'Профил нав карда шуд.')
+        return redirect('profile')
+
+    stats = {}
+    if request.user.role == 'landlord':
+        from property.models import Property
+        stats['property_count'] = Property.objects.filter(owner=request.user).count()
+    elif request.user.role == 'tenant':
+        from property.models import Favorite
+        stats['favorite_count'] = Favorite.objects.filter(user=request.user).count()
+
+    return render(request, 'profile.html', {'stats': stats})
