@@ -1,76 +1,29 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from .models import Property, Property_Image, Favorite
-from .forms import PropertyForm, PropertyImageForm
-from django.http import JsonResponse
-from django.db.models import Avg
-import os
-from django.http import JsonResponse
-from groq import Groq
-from dotenv import load_dotenv
-from django.views.decorators.csrf import csrf_exempt
 import json
-from .models import Property, Favorite, Message
+import os
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.db.models import Q
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
+from dotenv import load_dotenv
+from groq import Groq
 
-
-
-
-
+from . import services
+from .forms import PropertyForm, PropertyImageForm
+from .mixins import OwnerQuerysetMixin, RoleRequiredMixin, SetOwnerOnCreateMixin
+from .models import Favorite, Message, Property, Property_Image
 
 load_dotenv()
-
-api_key = os.getenv("GROQ_API_KEY")
 
 
 AI_RATE_LIMIT = 15
 AI_RATE_WINDOW = 60  
+api_key=GROQ_API_KEY
 
-AI_REPLY_LANGUAGES = {
-    'tg': 'Tajik',
-    'ru': 'Russian',
-    'en': 'English',
-}
-
-
-_CITY_KEYWORDS = ['dushanbe', 'душанбе', 'khujand', 'хуҷанд', 'худжанд', 'kulob', 'кӯлоб', 'куляб', 'bokhtar', 'бохтар']
-_TYPE_KEYWORDS = {
-    'apartment': ['apartment', 'квартира', 'квартираи', 'flat'],
-    'house': ['house', 'ҳавлӣ', 'хонаи', 'дом', 'ҳавлигӣ'],
-    'room': ['room', 'ҳуҷра', 'комната'],
-}
-
-
-def _find_relevant_properties(user_message):
-    
-    text = user_message.lower()
-    qs = Property.objects.filter(is_available=True)
-
-    for city in _CITY_KEYWORDS:
-        if city in text:
-            qs = qs.filter(city__icontains=city.split()[0][:4])
-            break
-
-    for ptype, keywords in _TYPE_KEYWORDS.items():
-        if any(kw in text for kw in keywords):
-            qs = qs.filter(property_type=ptype)
-            break
-
-    return qs.order_by('-created_at')[:5]
-
-
-def _format_properties_context(properties):
-    if not properties:
-        return "No matching properties were found in the database for this query."
-    lines = []
-    for p in properties:
-        lines.append(
-            f"- [ID {p.id}] {p.title} | {p.get_property_type_display()} | {p.price} TJS | "
-            f"{p.rooms} rooms, {p.area} m² | {p.city or '—'}, {p.district} | "
-            f"{'available' if p.is_available else 'not available'} | /property/{p.id}/"
-        )
-    return "\n".join(lines)
 
 
 @login_required
@@ -78,8 +31,6 @@ def ask_groq_view(request):
     if request.method != 'POST':
         return JsonResponse({'response': 'Метод пуштибонӣ намешавад.'}, status=405)
 
-   
-    from django.core.cache import cache
     cache_key = f'ai_rate_{request.user.pk}'
     request_count = cache.get(cache_key, 0)
     if request_count >= AI_RATE_LIMIT:
@@ -104,172 +55,23 @@ def ask_groq_view(request):
     if len(user_message) > 2000:
         return JsonResponse({'response': 'Паём хеле дароз аст (макс. 2000 аломат).'}, status=400)
 
-    reply_lang = AI_REPLY_LANGUAGES.get((data.get('lang') or '').lower(), 'Tajik')
-
-    # Дастрасии контекстӣ ба БОЗ — ҷустуҷӯи воқеӣ дар асоси паёми корбар,
-    # на такя ба маълумоти статикии frontend.
-    relevant_properties = _find_relevant_properties(user_message)
-    properties_context = _format_properties_context(relevant_properties)
+    reply_lang = services.AI_REPLY_LANGUAGES.get((data.get('lang') or '').lower(), 'Tajik')
+    relevant_properties = services.find_relevant_properties(user_message)
+    properties_context = services.format_properties_context(relevant_properties)
+    system_prompt = services.build_ai_system_prompt(reply_lang, properties_context)
 
     client = Groq(api_key=api_key)
-
     try:
         chat_completion = client.chat.completions.create(
             messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are the AI assistant for a real estate platform called Comfort Home."
-                        "You assist users ONLY within the real estate system: properties (listings), "
-                        "property details, search & filters, users, favorites, images, landlord actions "
-                        "(if allowed). You must NOT talk about unrelated topics. Always use real database "
-                        "data — you are given a REAL_PROPERTIES context block below with actual current "
-                        "listings relevant to the user's message; base your answer on that data and never "
-                        "invent or assume missing information. If REAL_PROPERTIES says no matches were "
-                        "found, tell the user nothing matched — do not make up a listing. If multiple "
-                        f"results exist, summarize briefly (max 5 items). Reply ONLY in {reply_lang}, "
-                        "regardless of what language the user wrote in — this is a strict UI-language "
-                        "requirement set by the platform, not a translation request. Never mix languages "
-                        "in one response. Short, clear, and useful. No long explanations. No storytelling. "
-                        "Focus on actions and data. If user asks outside real estate, politely refuse and "
-                        "return to platform topic. Do not give personal opinions. Be precise and "
-                        "professional. When mentioning a property include: Title, Price, Location, and a "
-                        "short 1-2 line description. You are not a general AI — you are a domain-specific "
-                        "real estate assistant for Comfort Home.\n\n"
-                        f"REAL_PROPERTIES (current matches from the database for this query):\n{properties_context}"
-                    )
-                },
-                {"role": "user", "content": user_message}
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
             ],
             model="openai/gpt-oss-120b",
         )
         return JsonResponse({'response': chat_completion.choices[0].message.content})
     except Exception:
         return JsonResponse({'response': 'Хатогӣ ҳангоми пайвастшавӣ ба AI. Лутфан баъдтар кӯшиш кунед.'}, status=502)
-
-
-
-@login_required
-def home(request):
-    propertys = Property.objects.all()
-    favorite_property_ids = []
-    
-    if request.user.is_authenticated:
-        favorite_property_ids = Favorite.objects.filter(user=request.user).values_list('property_id', flat=True)
-
-    
-    city = request.GET.get('q')
-    if city and isinstance(city, str):
-        propertys = propertys.filter(city__icontains=city.strip())
-
-    district = request.GET.get('qu')
-    if district and isinstance(district, str):
-        propertys = propertys.filter(district__icontains=district.strip())
-
-    min_price = request.GET.get('min_price')
-    if min_price:
-        propertys = propertys.filter(price__gte=min_price)
-
-    max_price = request.GET.get('max_price')
-    if max_price:
-        propertys = propertys.filter(price__lte=max_price)
-
-    return render(request, 'home.html', {'propertys': propertys, 'favorite_property_ids': favorite_property_ids})
-
-
-
-@login_required
-def about(request):
-    return render(request, 'about.html')
-
-
-@login_required
-def property_search(request):
-    
-    propertys = Property.objects.filter(is_available=True)
-
-    city = request.GET.get('city')
-    if isinstance(city, str):
-        city = city.strip()
-    if city:
-        propertys = propertys.filter(city__icontains=city)
-
-    district = request.GET.get('district')
-    if isinstance(district, str):
-        district = district.strip()
-    if district:
-        propertys = propertys.filter(district__icontains=district)
-
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-    if min_price and max_price:
-        propertys = propertys.filter(price__range=(min_price, max_price))
-    elif min_price:
-        propertys = propertys.filter(price__gte=min_price)
-    elif max_price:
-        propertys = propertys.filter(price__lte=max_price)
-
-    property_type = request.GET.get('property_type')
-    if property_type:
-        propertys = propertys.filter(property_type=property_type)
-
-    return render(request, 'property_search.html', {
-        'propertys': propertys.order_by('-created_at'),
-    })
-
-
-
-def property_detail(request, pk):
-    prop = get_object_or_404(Property, pk=pk)
-    is_favorited = False
-    messages = []
-
-
-    if request.method == 'POST' and request.user.is_authenticated:
-
-        if 'send_message' in request.POST:
-            content = (request.POST.get('content') or '').strip()
-            if content:
-                Message.objects.create(
-                    sender=request.user,
-                    receiver=prop.owner,
-                    property=prop,
-                    content=content
-                )
-            return redirect('property_detail', pk=pk)
-
-        
-
-
-    if request.user.is_authenticated:
-        is_favorited = Favorite.objects.filter(user=request.user, property=prop).exists()
-
-
-        messages = Message.objects.filter(property=prop).filter(
-            Q(sender=request.user) | Q(receiver=request.user)
-        ).order_by('timestamp')
-
-    
-    comparables = Property.objects.filter(
-        city=prop.city,
-        property_type=prop.property_type,
-    ).exclude(pk=prop.pk)
-    market_stats = comparables.aggregate(avg_price=Avg('price'))
-    market_avg = market_stats['avg_price']
-    market_count = comparables.count()
-    market_diff_pct = None
-    if market_avg:
-        market_avg = round(market_avg, 2)
-        market_diff_pct = round(((prop.price - market_avg) / market_avg) * 100)
-
-    return render(request, 'property_detail.html', {
-        'property': prop,
-        'is_favorited': is_favorited,
-        'messages': messages,
-        'market_avg': market_avg,
-        'market_count': market_count,
-        'market_diff_pct': market_diff_pct,
-    })
 
 
 def properties_map_data(request):
@@ -279,175 +81,232 @@ def properties_map_data(request):
         latitude__isnull=False,
         longitude__isnull=False,
     ).select_related('owner')[:200]
-
-    data = [
-        {
-            'id': p.id,
-            'title': p.title,
-            'price': str(p.price),
-            'city': p.city or '',
-            'district': p.district or '',
-            'lat': float(p.latitude),
-            'lng': float(p.longitude),
-            'type': p.get_property_type_display(),
-            'url': f'/property/{p.id}/',
-            'image': p.images.first().image.url if p.images.first() else None,
-        }
-        for p in propertys
-    ]
-    return JsonResponse({'properties': data})
-
-
-@login_required
-def property_list(request):
-
-    if not request.user.is_authenticated or request.user.role not in ('landlord', 'admin'):
-        return redirect('home')
-   
-    propertys = Property.objects.filter(owner=request.user)
-
-   
-    city = request.GET.get('q')
-    if city and isinstance(city, str):
-        propertys = propertys.filter(city__icontains=city.strip())
-
-    district = request.GET.get('qu')
-    if district and isinstance(district, str):
-        propertys = propertys.filter(district__icontains=district.strip())
-
-   
-    return render(request, 'property_search.html', {'propertys': propertys})
+    return JsonResponse({'properties': services.serialize_properties_for_map(propertys)})
 
 
 
-@login_required
-def create_property(request):
-    if not request.user.is_authenticated or request.user.role not in ('landlord', 'admin'):
-        return redirect('home')
 
-    if request.method == 'POST':
-        form = PropertyForm(request.POST)
-        if form.is_valid():
-            prop = form.save(commit=False)
-            prop.owner = request.user
-            prop.save()
-            return redirect('property_list')
-        return render(request, 'property_form.html', {'form': form})
+class HomeView(LoginRequiredMixin, ListView):
+    model = Property
+    template_name = 'home.html'
+    context_object_name = 'propertys'
 
-    return render(request, 'property_form.html', {'form': PropertyForm()})
+    def get_queryset(self):
+        qs = Property.objects.all()
+        city = self.request.GET.get('q')
+        if city and isinstance(city, str):
+            qs = qs.filter(city__icontains=city.strip())
+        district = self.request.GET.get('qu')
+        if district and isinstance(district, str):
+            qs = qs.filter(district__icontains=district.strip())
+        min_price = self.request.GET.get('min_price')
+        if min_price:
+            qs = qs.filter(price__gte=min_price)
+        max_price = self.request.GET.get('max_price')
+        if max_price:
+            qs = qs.filter(price__lte=max_price)
+        return qs
 
-
-
-@login_required
-def update_property(request, pk):
-    prop = get_object_or_404(Property, pk=pk, owner=request.user)
-
-    if request.method == 'POST':
-        form = PropertyForm(request.POST, instance=prop)
-        if form.is_valid():
-            form.save()
-            return redirect('property_list')
-        return render(request, 'property_form.html', {'form': form, 'property': prop})
-
-    return render(request, 'property_form.html', {'form': PropertyForm(instance=prop), 'property': prop})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['favorite_property_ids'] = Favorite.objects.filter(
+            user=self.request.user
+        ).values_list('property_id', flat=True)
+        return context
 
 
-@login_required
-def delete_property(request, pk):
-    prop = get_object_or_404(Property, pk=pk, owner=request.user)
-
-    if request.method == 'POST':
-        prop.delete()
-        return redirect('property_list')
-    return render(request, 'property_confirm_delete.html', {'property': prop})
+class AboutView(LoginRequiredMixin, TemplateView):
+    template_name = 'about.html'
 
 
+class PropertySearchView(LoginRequiredMixin, ListView):
+    
+    model = Property
+    template_name = 'property_search.html'
+    context_object_name = 'propertys'
 
-@login_required
-def propertyimage_list(request):
-    """Аксҳои марбут ба хонаҳои худи соҳибхона."""
-    propertyimages = Property_Image.objects.filter(property__owner=request.user)
+    def get_queryset(self):
+        qs = Property.objects.filter(is_available=True)
 
-    query = request.GET.get('q')
-    if isinstance(query, str):
-        query = query.strip()
-    if query:
-        propertyimages = propertyimages.filter(property__title__icontains=query)
+        city = (self.request.GET.get('city') or '').strip()
+        if city:
+            qs = qs.filter(city__icontains=city)
 
-    return render(request, 'propertyimage_list.html', {'propertyimages': propertyimages})
+        district = (self.request.GET.get('district') or '').strip()
+        if district:
+            qs = qs.filter(district__icontains=district)
+
+        min_price = self.request.GET.get('min_price')
+        max_price = self.request.GET.get('max_price')
+        if min_price and max_price:
+            qs = qs.filter(price__range=(min_price, max_price))
+        elif min_price:
+            qs = qs.filter(price__gte=min_price)
+        elif max_price:
+            qs = qs.filter(price__lte=max_price)
+
+        property_type = self.request.GET.get('property_type')
+        if property_type:
+            qs = qs.filter(property_type=property_type)
+
+        return qs.order_by('-created_at')
 
 
+class PropertyDetailView(DetailView):
+    """Кушода барои ҳама (анонимӣ низ) — фақат амалҳои интерактивӣ вуруд металабанд."""
+    model = Property
+    template_name = 'property_detail.html'
+    context_object_name = 'property'
 
-@login_required
-def create_propertyimage(request):
-    if not request.user.is_authenticated or request.user.role not in ('landlord', 'admin'):
-        return redirect('home')
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if request.user.is_authenticated and 'send_message' in request.POST:
+            content = (request.POST.get('content') or '').strip()
+            if content:
+                Message.objects.create(
+                    sender=request.user,
+                    receiver=self.object.owner,
+                    property=self.object,
+                    content=content,
+                )
+        return redirect('property_detail', pk=self.object.pk)
 
-    if request.method == 'POST':
-        form = PropertyImageForm(request.POST, request.FILES, owner=request.user)
-        if form.is_valid():
-            # Мутмаин мешавем, ки хонаи интихобшуда воқеан ба ҳамин корбар тааллуқ дорад
-            prop = get_object_or_404(Property, pk=form.cleaned_data['property'].pk, owner=request.user)
-            image = form.save(commit=False)
-            image.property = prop
-            image.save()
-            return redirect('propertyimages_list')
-        return render(request, 'propertyimage_form.html', {
-            'form': form,
-            'propertys': Property.objects.filter(owner=request.user),
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        prop = self.object
+        is_favorited = False
+        messages_qs = []
+
+        if self.request.user.is_authenticated:
+            is_favorited = Favorite.objects.filter(user=self.request.user, property=prop).exists()
+            messages_qs = Message.objects.filter(property=prop).filter(
+                Q(sender=self.request.user) | Q(receiver=self.request.user)
+            ).order_by('timestamp')
+
+        market_avg, market_count, market_diff_pct = services.get_market_valuation(prop)
+        context.update({
+            'is_favorited': is_favorited,
+            'messages': messages_qs,
+            'market_avg': market_avg,
+            'market_count': market_count,
+            'market_diff_pct': market_diff_pct,
         })
-
-    return render(request, 'propertyimage_form.html', {
-        'form': PropertyImageForm(owner=request.user),
-        'propertys': Property.objects.filter(owner=request.user),
-    })
-
-
-@login_required
-def update_propertyimage(request, pk):
-    propertyimage = get_object_or_404(Property_Image, pk=pk, property__owner=request.user)
-
-    if request.method == 'POST':
-        form = PropertyImageForm(request.POST, request.FILES, instance=propertyimage, owner=request.user)
-        if form.is_valid():
-            prop = get_object_or_404(Property, pk=form.cleaned_data['property'].pk, owner=request.user)
-            image = form.save(commit=False)
-            image.property = prop
-            image.save()
-            return redirect('propertyimages_list')
-        return render(request, 'update_propertyimages.html', {'form': form, 'propertyimage': propertyimage})
-
-    return render(request, 'update_propertyimages.html', {
-        'form': PropertyImageForm(instance=propertyimage, owner=request.user),
-        'propertyimage': propertyimage,
-    })
+        return context
 
 
 
-@login_required
-def delete_propertyimage(request, pk):
-    propertyimage = get_object_or_404(Property_Image, pk=pk, property__owner=request.user)
 
-    if request.method == 'POST':
-        propertyimage.delete()
-        return redirect('propertyimages_list')
-    return render(request, 'delete_propertyimages.html', {'propertyimage': propertyimage})
+class PropertyListView(LoginRequiredMixin, RoleRequiredMixin, OwnerQuerysetMixin, ListView):
+    model = Property
+    allowed_roles = ('landlord', 'admin')
+    template_name = 'property_search.html'
+    context_object_name = 'propertys'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        city = self.request.GET.get('q')
+        if city and isinstance(city, str):
+            qs = qs.filter(city__icontains=city.strip())
+        district = self.request.GET.get('qu')
+        if district and isinstance(district, str):
+            qs = qs.filter(district__icontains=district.strip())
+        return qs
 
 
-@login_required
-def favorite_list(request):
-    if not request.user.is_authenticated or request.user.role not in ('tenant', 'admin'):
-        return redirect('home')
-        
-    favorites = Favorite.objects.filter(user=request.user).select_related('property')
+class PropertyCreateView(LoginRequiredMixin, RoleRequiredMixin, SetOwnerOnCreateMixin, CreateView):
+    model = Property
+    form_class = PropertyForm
+    allowed_roles = ('landlord', 'admin')
+    template_name = 'property_form.html'
+    success_url = reverse_lazy('property_list')
+
+
+class PropertyUpdateView(LoginRequiredMixin, OwnerQuerysetMixin, UpdateView):
+    model = Property
+    form_class = PropertyForm
+    template_name = 'property_form.html'
+    context_object_name = 'property'
+    success_url = reverse_lazy('property_list')
+
+
+class PropertyDeleteView(LoginRequiredMixin, OwnerQuerysetMixin, DeleteView):
+    model = Property
+    template_name = 'property_confirm_delete.html'
+    context_object_name = 'property'
+    success_url = reverse_lazy('property_list')
+
+
+
+
+class PropertyImageListView(LoginRequiredMixin, ListView):
+    model = Property_Image
+    template_name = 'propertyimage_list.html'
+    context_object_name = 'propertyimages'
+
+    def get_queryset(self):
+        qs = Property_Image.objects.filter(property__owner=self.request.user)
+        query = self.request.GET.get('q')
+        if isinstance(query, str) and query.strip():
+            qs = qs.filter(property__title__icontains=query.strip())
+        return qs
+
+
+class PropertyImageFormMixin:
     
-   
-    favorite_properties = [fav.property for fav in favorites]
-    
-    
-    return render(request, 'favorites_list.html', {
-        'favorite_properties': favorite_properties
-    })
+    model = Property_Image
+    form_class = PropertyImageForm
+    success_url = reverse_lazy('propertyimages_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['owner'] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['propertys'] = Property.objects.filter(owner=self.request.user)
+        return context
+
+    def form_valid(self, form):
+        prop = get_object_or_404(Property, pk=form.cleaned_data['property'].pk, owner=self.request.user)
+        form.instance.property = prop
+        return super().form_valid(form)
+
+
+class PropertyImageCreateView(LoginRequiredMixin, RoleRequiredMixin, PropertyImageFormMixin, CreateView):
+    allowed_roles = ('landlord', 'admin')
+    template_name = 'propertyimage_form.html'
+
+
+class PropertyImageUpdateView(LoginRequiredMixin, PropertyImageFormMixin, UpdateView):
+    template_name = 'update_propertyimages.html'
+
+    def get_queryset(self):
+        return Property_Image.objects.filter(property__owner=self.request.user)
+
+
+class PropertyImageDeleteView(LoginRequiredMixin, DeleteView):
+    model = Property_Image
+    template_name = 'delete_propertyimages.html'
+    success_url = reverse_lazy('propertyimages_list')
+
+    def get_queryset(self):
+        return Property_Image.objects.filter(property__owner=self.request.user)
+
+
+
+class FavoriteListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+    model = Favorite
+    allowed_roles = ('tenant', 'admin')
+    template_name = 'favorites_list.html'
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user).select_related('property')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['favorite_properties'] = [fav.property for fav in self.object_list]
+        return context
 
 
 @login_required
@@ -455,33 +314,29 @@ def toggle_favorite(request, pk):
     if request.method == 'POST':
         property_obj = get_object_or_404(Property, pk=pk)
         favorite, created = Favorite.objects.get_or_create(user=request.user, property=property_obj)
-        
+
         if not created:
             favorite.delete()
             status = 'removed'
         else:
             status = 'added'
-            
-        
+
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'status': status})
-            
-        
+
         return redirect(request.META.get('HTTP_REFERER', 'home'))
-        
+
     return redirect('home')
 
 
-@login_required
-def delete_favorite(request, pk):
-    favorite = get_object_or_404(Favorite, pk=pk, user=request.user)
+class FavoriteDeleteView(LoginRequiredMixin, DeleteView):
+    model = Favorite
+    template_name = 'delete_favorites.html'
+    success_url = reverse_lazy('favorite_list')
 
-    if request.method == 'POST':
-        favorite.delete()
-        return redirect('favorite_list')
-    return render(request, 'delete_favorites.html', {'favorite': favorite})
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user)
 
 
-@login_required
-def landlord_dashboard(request):
-    return render(request, 'landlord_dashboard.html')
+class LandlordDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'dashboard/landlord_dashboard.html'
