@@ -57,3 +57,15 @@ def _find_relevant_properties(user_message):
     return qs.order_by('-created_at')[:5]
 
 
+def _format_properties_context(properties):
+    if not properties:
+        return "No matching properties were found in the database for this query."
+    lines = []
+    for p in properties:
+        lines.append(
+            f"- [ID {p.id}] {p.title} | {p.get_property_type_display()} | {p.price} TJS | "
+            f"{p.rooms} rooms, {p.area} m² | {p.city or '—'}, {p.district} | "
+            f"{'available' if p.is_available else 'not available'} | /property/{p.id}/"
+        )
+    return "\n".join(lines)
+
