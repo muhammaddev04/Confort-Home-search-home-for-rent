@@ -113,7 +113,16 @@
         })();
     </script>
 
-    
+    <!-- ============ SEARCH ============ -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <form method="GET" action="{% url 'home' %}" class="reveal in bg-white dark:bg-white/5 p-5 sm:p-6 rounded-2xl shadow-soft border border-ink/5 dark:border-white/10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <div><label class="block text-xs font-bold text-stone uppercase mb-1 px-1">Шаҳр</label><input type="text" name="q" value="{{ request.GET.q }}" placeholder="Душанбе...." class="w-full px-3 py-2.5 bg-cream dark:bg-white/5 dark:text-white rounded-lg border border-ink/10 dark:border-white/10 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm transition"></div>
+            <div><label class="block text-xs font-bold text-stone uppercase mb-1 px-1">Ноҳия</label><input type="text" name="qu" value="{{ request.GET.qu }}" placeholder="Ноҳия...." class="w-full px-3 py-2.5 bg-cream dark:bg-white/5 dark:text-white rounded-lg border border-ink/10 dark:border-white/10 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm transition"></div>
+            <div><label class="block text-xs font-bold text-stone uppercase mb-1 px-1">Нарх аз-</label><input type="number" name="min_price" value="{{ request.GET.min_price }}" placeholder="Мин-" class="w-full px-3 py-2.5 bg-cream dark:bg-white/5 dark:text-white rounded-lg border border-ink/10 dark:border-white/10 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm transition"></div>
+            <div><label class="block text-xs font-bold text-stone uppercase mb-1 px-1">Нарх то-</label><input type="number" name="max_price" value="{{ request.GET.max_price }}" placeholder="Макс-" class="w-full px-3 py-2.5 bg-cream dark:bg-white/5 dark:text-white rounded-lg border border-ink/10 dark:border-white/10 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold text-sm transition"></div>
+            <button type="submit" class="w-full gradient-btn text-white py-[11px] rounded-lg font-display font-semibold transition text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-magnifying-glass"></i> <span data-lang="search_btn">Ҷустуҷӯ</span></button>
+        </form>
+    </div>
 
     <!-- ============ CATEGORIES ============ -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
