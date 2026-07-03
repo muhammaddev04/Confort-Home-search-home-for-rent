@@ -350,3 +350,13 @@ def update_property(request, pk):
         return render(request, 'property_form.html', {'form': form, 'property': prop})
 
     return render(request, 'property_form.html', {'form': PropertyForm(instance=prop), 'property': prop})
+
+
+@login_required
+def delete_property(request, pk):
+    prop = get_object_or_404(Property, pk=pk, owner=request.user)
+
+    if request.method == 'POST':
+        prop.delete()
+        return redirect('property_list')
+    return render(request, 'property_confirm_delete.html', {'property': prop})
