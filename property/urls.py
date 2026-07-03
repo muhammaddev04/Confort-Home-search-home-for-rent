@@ -10,4 +10,5 @@ urlpatterns = [
     path('dashboard/', views.landlord_dashboard, name='landlord_dashboard'), 
     path('my-properties/', views.property_list, name='property_list'),
     path('create-property/', views.create_property, name='create_property'),
+    path('update-property/<int:pk>/', views.update_property, name='update_property'),
 ]

@@ -336,3 +336,17 @@ def create_property(request):
 
     return render(request, 'property_form.html', {'form': PropertyForm()})
 
+
+
+@login_required
+def update_property(request, pk):
+    prop = get_object_or_404(Property, pk=pk, owner=request.user)
+
+    if request.method == 'POST':
+        form = PropertyForm(request.POST, instance=prop)
+        if form.is_valid():
+            form.save()
+            return redirect('property_list')
+        return render(request, 'property_form.html', {'form': form, 'property': prop})
+
+    return render(request, 'property_form.html', {'form': PropertyForm(instance=prop), 'property': prop})
