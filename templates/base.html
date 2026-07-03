@@ -384,6 +384,756 @@
             <div id="compare-table-wrap" class="overflow-auto p-6"></div>
         </div>
     </div>
-    
+    <script>
+    const translations = {
+
+        tg: {
+
+            favorites_btn: "Маҳбубҳо",
+
+            nav_home: "Асосӣ",
+
+            nav_about: "Дар бораи мо",
+
+            nav_properties: "Амволҳо",
+
+            nav_add: "Эълон +",
+
+            nav_logout: "Хурӯҷ",
+
+            nav_login: "Вуруд",
+
+            nav_register: "Сабти ном",
+
+            footer_text: "Ҳамаи ҳуқуқҳо ҳифз шудаанд.",
+
+            hero_title: "Хонаи орзуҳои худро бо Comfort Home пайдо кунед",
+
+            hero_sub: "Беҳтарин амволҳо ва хонаҳо барои иҷора  дар Тоҷикистон.",
+
+            search_btn: "Ҷустуҷӯ",
+
+            sections_title: "Амволҳои охирин",
+
+            rooms: "Ҳуҷраҳо *",
+
+            area: "Масоҳат (м²) *",
+
+            details: "Муфассал",
+
+            no_properties: "Ҳеҷ амволе ёфт нашуд.",
+
+            about_title: "Дар бораи Comfort Home",
+
+            about_subtitle: "Мо ба шумо барои пайдо кардани беҳтарин ва қулайтарин хонаҳо ва амволҳо дар Тоҷикистон кӯмак мерасонем.",
+
+            stat_clients: "Мизоҷони қаноатманд",
+
+            stat_properties: "Амволҳои фаъол",
+
+            stat_years: "Сол таҷриба",
+
+            about_why_title: "Чаро маҳз мо?",
+
+            about_why_text: "Платформаи мо ба соҳибони амвол имкон медиҳад, ки эълонҳои худро зуд ҷойгир кунанд, ва ба иҷорагирон имкон медиҳад, ки хонаи дилхоҳашонро пайдо кунанд.",
+
+            about_f1_title: "Амнияти Пурра",
+
+            about_f1_text: "Ҳамаи соҳибони амвол ва эълонҳо санҷида мешаванд.",
+
+            search_res_title: "Натиҷаҳои ҷустуҷӯ",
+
+            owner: "Соҳибмулк",
+
+            description: "Тавсиф",
+            address_details: "Сурогаи пурра",
+            amenities:"Имконот",
+
+            my_prop_title: "Эълонҳои ман",
+
+            table_title: "Ном *",
+
+            table_price: "Нарх (TJS) *",
+
+            table_city: "Шаҳр",
+
+            table_actions: "Амалҳо",
+
+            form_prop_title: "Формаи амвол",
+
+            save_btn: "Захира кардан",
+
+            delete_title: "Тасдиқи несткунӣ",
+
+            delete_sub: "Оё шумо мутмаин ҳастед?",
+
+            cancel_btn: "Бекор кардан",
+
+            select_prop: "Интихоби амвол",
+
+            select_file: "Суратро интихоб кунед",
+
+            logout_btn: "Баромад",
+
+           
+
+            // НАВ:
+
+            label_type: "Намуди амвол *",
+
+            opt_select: "Интихоб кунед",
+
+            opt_apartment: "Квартира",
+
+            opt_house: "Ҳавлигӣ",
+
+            opt_commercial: "Тиҷоратӣ",
+
+            label_district: "Ноҳия *",
+
+            label_address: "Суроғаи дақиқ *",
+
+            label_amenities: "Шароитҳо *",
+
+            label_available: "Барои иҷора/фурӯш омода аст",
+
+
+
+            label_location: "Ҷойгиршавӣ",
+
+            label_price_from: "Нарх аз (TJS)",
+
+            label_price_to: "Нарх то (TJS)",
+
+            my_ad: "Эълони ман",
+
+            edit_btn: "Таҳрир",
+
+            delete_btn: "Нест кардан",
+
+            contact_owner: "Тамос бо соҳибхона",
+
+            no_phone: "Рақами телефон мавҷуд нест",
+
+            footer_desc: "Беҳтарин платформа барои ҷустуҷӯ ва дарёфти амволи ғайриманқул дар Тоҷикистон.",
+
+            footer_links: "Истинодҳо",
+
+            home_page: "Саҳифаи асосӣ",
+
+            terms_of_use: "Дар бораи мо",
+
+            footer_contact: "Тамос бо мо",
+
+            footer_rights: "2026 Comfort Home. Ҳамаи ҳуқуқҳо ҳифз шудаанд.",
+
+            add_images: " Иловаи сурат +",
+
+            floor:"Ошёна",
+
+
+
+            login_h2: "Вуруд ба система",
+
+            login_user: "Номи корбарӣ ё Email",
+
+            login_pass: "Парол",
+
+            login_btn: "Вуруд",
+
+
+
+            error_invalid_credentials: "Номи корбар ё рамз нодуруст аст!",
+
+            error_not_active: "Аввал почтаи худро тасдиқ кунед!",
+
+
+
+            nav_register: "Сабти ном",
+
+
+
+            fav_sub_title: "Рӯйхати амволҳое, ки ба шумо писанд омадаанд.",
+
+            no_fav_properties: "Шумо ҳеҷ амволеро ба маҳбубҳо илова накардаед.",
+
+            back_to_home: "Саҳифаи асосӣ",
+
+            reg_h2: "Сабти ном",
+            reg_role: "Нақш (Мақсад)",
+            reg_pass2: "Такрори парол",
+            reg_btn: "Сабти ном",
+
+            conf_h2: "Тасдиқи почтаи электронӣ",
+            conf_sub: "Лутфан коди ба почтаи шумо фиристодашударо ворид кунед.",
+            conf_btn: "Тасдиқ кардан",
+
+            confirm_btn: "Нест кардан",
+            img_add_btn: "Иловаи сурат",
+            stat_properties_short: "амвол ёфт шуд",
+
+            chat_title: "Ёрдамчии AI",
+            chat_placeholder: "Паёми худро нависед...",
+            chat_send: "Фиристодан",
+            chat_you: "Шумо",
+            chat_ai: "AI",
+            chat_empty: "Саволи худро дар бораи амволҳо бипурсед.",
+            chat_open: "Кушодани ёрдамчии AI",
+            chat_close: "Пӯшидани ёрдамчии AI",
+
+            fav_toggle_add: "Илова ба маҳбубҳо",
+            fav_toggle_remove: "Маҳбубҳо (Нест кардан)",
+            login_to_save: "Барои маҳфуз кардан ворид шавед",
+
+            verified_label: "Тасдиқшуда",
+            compare_add: "Муқоиса",
+            compare_selected: "амвол интихоб шуд",
+            compare_view: "Муқоиса кардан",
+            compare_clear: "Тоза кардан",
+            compare_title: "Муқоисаи амволҳо",
+            compare_empty: "Ҳанӯз амволе барои муқоиса интихоб нашудааст.",
+            compare_max_reached: "Шумо метавонед ҳадди аксар 4 амволро муқоиса кунед.",
+            compare_remove: "Аз муқоиса баровардан",
+            compare_details: "Муфассал",
+            compare_row_price: "Нарх",
+            compare_row_type: "Намуд",
+            compare_row_rooms: "Ҳуҷраҳо",
+            compare_row_area: "Масоҳат",
+            compare_row_floor: "Ошёна",
+            compare_row_city: "Шаҳр",
+            compare_row_district: "Ноҳия",
+            compare_row_available: "Дастрасӣ",
+            compare_row_verified: "Тасдиқ",
+            compare_yes: "Ҳа",
+            compare_no: "Не",
+
+            valuation_title: "Баҳодиҳии нарх",
+            valuation_yours: "Нархи шумо",
+            valuation_market: "Миёнаи бозор",
+            valuation_above: "аз миёнаи бозор баландтар",
+            valuation_below: "аз миёнаи бозор пасттар",
+            valuation_average: "тақрибан дар сатҳи бозор",
+            valuation_disclaimer: "* Ин баҳодиҳӣ дар асоси эълонҳои воқеии дигар дар ҳамин шаҳр ва навъ ҳисоб карда шудааст.",
+            valuation_no_data: "Барои баҳодиҳӣ дар ин шаҳр/навъ ҳанӯз эълони кофии монанд нест.",
+            valuation_sample_size: "дар асоси {n} эълони монанд",
+
+            profile_role_landlord: "Соҳибмулк",
+            profile_role_tenant: "Иҷорагир",
+            profile_role_admin: "Маъмур",
+            profile_your_listings: "Эълонҳои шумо",
+            profile_manage_listings: "Идора кардани эълонҳо",
+            profile_your_favorites: "Амволҳои маҳбуб",
+            profile_edit_title: "Таҳрири профил",
+            profile_photo: "Сурати профил",
+            profile_bio: "Дар бораи худ",
+            profile_phone: "Рақами телефон",
+            nav_profile: "Профил",
+
+            map_title: "Амволҳо дар харита",
+            map_view_details: "Дидани тафсилот"
+
+        },
+
+        ru: {
+
+            favorites_btn: "Избранное",
+
+            nav_home: "Главная",
+
+            nav_about: "О нас",
+
+            nav_properties: "Недвижимость",
+
+            nav_add: "Объявление +",
+
+            nav_logout: "Выход",
+
+            nav_login: "Вход",
+
+            nav_register: "Регистрация",
+
+            footer_text: "Все права защищены.",
+
+            hero_title: "Найдите дом своей мечты с Comfort Home",
+
+            hero_sub: "Лучшая недвижимость для аренды в Таджикистане.",
+
+            search_btn: "Поиск",
+
+            sections_title: "Последние объявления",
+
+            rooms: "Комнаты *",
+
+            area: "Площадь (м²) *",
+
+            details: "Подробнее",
+
+            no_properties: "Объявлений не найдено.",
+
+            about_title: "О компании Comfort Home",
+
+            about_subtitle: "Мы помогаем вам найти лучшие и самые удобные дома и объекты недвижимости в Таджикистане.",
+
+            stat_clients: "Довольных клиентов",
+
+            stat_properties: "Активных объектов",
+
+            stat_years: "Лет опыта",
+
+            about_why_title: "Почему именно мы?",
+
+            about_why_text: "Наша платформа позволяет владельцам недвижимости быстро размещать объявления, а арендаторам — находить дом своей мечты.",
+
+            about_f1_title: "Полная Безопасность",
+
+            about_f1_text: "Все владельцы и объявления проверяются вручную.",
+
+            search_res_title: "Результаты поиска",
+
+            owner: "Собственник",
+
+            description: "Описание",
+            address_details: "Адресс",
+
+            my_prop_title: "Мои объявления",
+
+            table_title: "Название *",
+
+            table_price: "Цена (TJS) *",
+
+            table_city: "Город",
+
+            table_actions: "Действия",
+
+            form_prop_title: "Форма объявления",
+
+            save_btn: "Сохранить",
+
+            delete_title: "Подтверждение удаления",
+
+            delete_sub: "Вы уверены?",
+
+            cancel_btn: "Отмена",
+
+            select_prop: "Выберите объект",
+
+            select_file: "Выберите фото",
+
+            logout_btn: "Выход",
+
+            amenities:"Имконот",
+
+           
+
+            // НАВ:
+
+            label_type: "Тип недвижимости *",
+
+            opt_select: "Выберите",
+
+            opt_apartment: "Квартира",
+
+            opt_house: "Дом / Участок",
+
+            opt_commercial: "Коммерческая",
+
+            label_district: "Район *",
+
+            label_address: "Точный адрес *",
+
+            label_amenities: "Удобства *",
+
+            label_available: "Доступно для аренды/продажи",
+
+
+
+            label_location: "Местоположение",
+
+            label_price_from: "Цена от (TJS)",
+
+            label_price_to: "Цена до (TJS)",
+
+            my_ad: "Моё объявление",
+
+            edit_btn: "Редактировать",
+
+            delete_btn: "Удалить",
+
+            contact_owner: "Связаться с владельцем",
+
+            no_phone: "Номер телефона не указан",
+
+            footer_desc: "Лучшая платформа для поиска и покупки недвижимости в Таджикистане.",
+
+            footer_links: "Ссылки",
+
+            home_page: "Главная страница",
+
+            terms_of_use: "О нас",
+
+            footer_contact: "Свяжитесь с нами",
+
+            footer_rights: "2026 Comfort Home. Все права защищены.",
+
+            add_images: "Добавить фото +",
+
+
+
+            login_h2: "Вход в систему",
+
+            login_user: "Имя пользователя или Email",
+
+            login_pass: "Пароль",
+
+            login_btn: "Войти",
+
+
+
+            error_invalid_credentials: "Неверное имя пользователя или пароль!",
+
+            error_not_active: "Пожалуйста, подтвердите вашу почту!",
+
+            floor:"Этаж",
+
+
+
+            nav_register: "Регистрация",
+
+
+
+            fav_sub_title: "Список объектов недвижимости, которые вам понравились.",
+
+            no_fav_properties: "Вы не добавили ни одного объекта в избранное.",
+
+            back_to_home: "На главную",
+
+            reg_h2: "Регистрация",
+            reg_role: "Роль (Статус)",
+            reg_pass2: "Повторите пароль",
+            reg_btn: "Зарегистрироваться",
+
+            conf_h2: "Подтверждение почты",
+            conf_sub: "Пожалуйста, введите код, отправленный на вашу почту.",
+            conf_btn: "Подтвердить",
+
+            confirm_btn: "Удалить",
+            img_add_btn: "Добавить фото",
+            stat_properties_short: "объектов найдено",
+
+            chat_title: "AI-ассистент",
+            chat_placeholder: "Напишите сообщение...",
+            chat_send: "Отправить",
+            chat_you: "Вы",
+            chat_ai: "AI",
+            chat_empty: "Задайте вопрос о недвижимости.",
+            chat_open: "Открыть AI-ассистента",
+            chat_close: "Закрыть AI-ассистента",
+
+            fav_toggle_add: "Добавить в избранное",
+            fav_toggle_remove: "Избранное (Удалить)",
+            login_to_save: "Войдите, чтобы сохранить",
+
+            verified_label: "Проверено",
+            compare_add: "Сравнить",
+            compare_selected: "объект(ов) выбрано",
+            compare_view: "Сравнить",
+            compare_clear: "Очистить",
+            compare_title: "Сравнение объектов",
+            compare_empty: "Пока не выбрано ни одного объекта для сравнения.",
+            compare_max_reached: "Можно сравнивать не более 4 объектов одновременно.",
+            compare_remove: "Убрать из сравнения",
+            compare_details: "Подробнее",
+            compare_row_price: "Цена",
+            compare_row_type: "Тип",
+            compare_row_rooms: "Комнаты",
+            compare_row_area: "Площадь",
+            compare_row_floor: "Этаж",
+            compare_row_city: "Город",
+            compare_row_district: "Район",
+            compare_row_available: "Доступность",
+            compare_row_verified: "Проверка",
+            compare_yes: "Да",
+            compare_no: "Нет",
+
+            valuation_title: "Оценка цены",
+            valuation_yours: "Ваша цена",
+            valuation_market: "Средняя по рынку",
+            valuation_above: "выше средней по рынку",
+            valuation_below: "ниже средней по рынку",
+            valuation_average: "примерно на уровне рынка",
+            valuation_disclaimer: "* Эта оценка рассчитана на основе других реальных объявлений в этом городе и с этим типом недвижимости.",
+            valuation_no_data: "Пока недостаточно похожих объявлений в этом городе/типе для оценки.",
+            valuation_sample_size: "на основе {n} похожих объявлений",
+
+            profile_role_landlord: "Собственник",
+            profile_role_tenant: "Арендатор",
+            profile_role_admin: "Администратор",
+            profile_your_listings: "Ваши объявления",
+            profile_manage_listings: "Управление объявлениями",
+            profile_your_favorites: "Избранные объекты",
+            profile_edit_title: "Редактировать профиль",
+            profile_photo: "Фото профиля",
+            profile_bio: "О себе",
+            profile_phone: "Номер телефона",
+            nav_profile: "Профиль",
+
+            map_title: "Объекты на карте",
+            map_view_details: "Подробнее"
+
+        },
+
+        en: {
+
+            favorites_btn: "Favorites",
+
+            nav_home: "Home",
+
+            nav_about: "About Us",
+
+            nav_properties: "Properties",
+
+            nav_add: "Add Post +",
+
+            nav_logout: "Logout",
+
+            nav_login: "Login",
+
+            nav_register: "Register",
+
+            footer_text: "All rights reserved.",
+
+            hero_title: "Find Your Dream Home with Comfort Home",
+
+            hero_sub: "The best real estate and apartments for rent  in Tajikistan.",
+
+            search_btn: "Search",
+
+            sections_title: "Latest Properties",
+
+            rooms: "Rooms *",
+
+            area: "Area (m²) *",
+
+            details: "Details",
+
+            no_properties: "No properties found.",
+
+            about_title: "About Comfort Home",
+
+            about_subtitle: "We help you find the best and most comfortable homes and properties in Tajikistan.",
+
+            stat_clients: "Satisfied Clients",
+
+            stat_properties: "Active Properties",
+
+            stat_years: "Years of Experience",
+
+            about_why_title: "Why Choose Us?",
+
+            about_why_text: "Our platform allows property owners to list their properties quickly, and helps tenants find the home of their dreams.",
+
+            about_f1_title: "Full Security",
+
+            about_f1_text: "All property owners and listings are verified.",
+
+            search_res_title: "Search Results",
+
+            owner: "Owner",
+
+            description: "Description",
+            address_details: "Address_details",
+
+            my_prop_title: "My Listings",
+
+            table_title: "Title *",
+
+            table_price: "Price (TJS) *",
+
+            table_city: "City",
+
+            table_actions: "Actions",
+
+            form_prop_title: "Property Form",
+
+            save_btn: "Save",
+
+            delete_title: "Confirm Delete",
+
+            delete_sub: "Are you absolutely sure?",
+
+            cancel_btn: "Cancel",
+
+            select_prop: "Select Property",
+
+            select_file: "Choose Image File",
+
+            logout_btn: "Logout",
+
+           
+
+            // НАВ:
+
+            label_type: "Property Type *",
+
+            opt_select: "Select",
+
+            opt_apartment: "Apartment",
+
+            opt_house: "House",
+
+            opt_commercial: "Commercial",
+
+            label_district: "District *",
+
+            label_address: "Exact Address *",
+
+            label_amenities: "Amenities *",
+
+            label_available: "Available for rent/sale",
+
+            contact_owner: "Contact Owner",
+
+            no_phone: "Phone number not provided",
+
+
+
+            label_location: "Location",
+
+            label_price_from: "Price from (TJS)",
+
+            label_price_to: "Price to (TJS)",
+
+            my_ad: "My ad",
+
+            edit_btn: "Edit",
+
+            delete_btn: "Delete",
+
+            amenities:"Amenities",
+
+
+
+            footer_desc: "The best platform for searching and buying real estate in Tajikistan.",
+
+            footer_links: "Links",
+
+            home_page: "Home Page",
+
+            terms_of_use: "About Us",
+
+            footer_contact: "Contact Us",
+
+            footer_rights: "2026 Comfort Home. All rights reserved.",
+
+            add_images: "Add photo +",
+
+
+
+            login_h2: "Sign In",
+
+            login_user: "Username or Email",
+
+            login_pass: "Password",
+
+            login_btn: "Login",
+
+
+
+            error_invalid_credentials: "Invalid username or password!",
+
+            error_not_active: "Please verify your email!",
+
+            floor:"floor",
+
+
+
+            nav_register: "Register",
+
+
+
+            fav_sub_title: "List of properties that you liked.",
+
+            no_fav_properties: "You have not added any properties to your favorites.",
+
+            back_to_home: "Back to Home",
+
+            reg_h2: "Create Account",
+            reg_role: "I am a...",
+            reg_pass2: "Confirm Password",
+            reg_btn: "Register",
+
+            conf_h2: "Confirm Your Email",
+            conf_sub: "Please enter the code sent to your email.",
+            conf_btn: "Confirm",
+
+            confirm_btn: "Delete",
+            img_add_btn: "Add Photo",
+            stat_properties_short: "properties found",
+
+            chat_title: "AI Assistant",
+            chat_placeholder: "Type your message...",
+            chat_send: "Send",
+            chat_you: "You",
+            chat_ai: "AI",
+            chat_empty: "Ask a question about our properties.",
+            chat_open: "Open AI assistant",
+            chat_close: "Close AI assistant",
+
+            fav_toggle_add: "Add to Favorites",
+            fav_toggle_remove: "Favorited (Remove)",
+            login_to_save: "Log in to save",
+
+            verified_label: "Verified",
+            compare_add: "Compare",
+            compare_selected: "propert(y/ies) selected",
+            compare_view: "Compare",
+            compare_clear: "Clear",
+            compare_title: "Compare Properties",
+            compare_empty: "No properties selected for comparison yet.",
+            compare_max_reached: "You can compare up to 4 properties at a time.",
+            compare_remove: "Remove from comparison",
+            compare_details: "Details",
+            compare_row_price: "Price",
+            compare_row_type: "Type",
+            compare_row_rooms: "Rooms",
+            compare_row_area: "Area",
+            compare_row_floor: "Floor",
+            compare_row_city: "City",
+            compare_row_district: "District",
+            compare_row_available: "Availability",
+            compare_row_verified: "Verified",
+            compare_yes: "Yes",
+            compare_no: "No",
+
+            valuation_title: "Price Valuation",
+            valuation_yours: "Your Price",
+            valuation_market: "Market Average",
+            valuation_above: "above the market average",
+            valuation_below: "below the market average",
+            valuation_average: "roughly in line with the market",
+            valuation_disclaimer: "* This estimate is calculated from other real listings in the same city and property type.",
+            valuation_no_data: "Not enough similar listings in this city/type yet for a valuation.",
+            valuation_sample_size: "based on {n} similar listings",
+
+            profile_role_landlord: "Landlord",
+            profile_role_tenant: "Tenant",
+            profile_role_admin: "Admin",
+            profile_your_listings: "Your Listings",
+            profile_manage_listings: "Manage Listings",
+            profile_your_favorites: "Favorite Properties",
+            profile_edit_title: "Edit Profile",
+            profile_photo: "Profile Photo",
+            profile_bio: "About You",
+            profile_phone: "Phone Number",
+            nav_profile: "Profile",
+
+            map_title: "Properties on the Map",
+            map_view_details: "View Details"
+
+        }
+
+    };
+
+</script>
 </body>
 </html>
