@@ -251,7 +251,86 @@
         {% endif %}
     </div>
 </nav>
+<script>
+    // Тугмаи менюи мобилӣ (танҳо UI-и nav — ба translations/dark-mode/chat дахл надорад)
+    (function () {
+        const toggle = document.getElementById('mobile-menu-toggle');
+        const menu = document.getElementById('mobile-menu');
+        if (!toggle || !menu) return;
 
+        const closeMenu = () => {
+            menu.classList.add('hidden');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+        };
+        const openMenu = () => {
+            menu.classList.remove('hidden');
+            toggle.setAttribute('aria-expanded', 'true');
+            toggle.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        };
+
+        toggle.addEventListener('click', () => {
+            menu.classList.contains('hidden') ? openMenu() : closeMenu();
+        });
+        menu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) closeMenu();
+        });
+    })();
+
+    // Аниматсияи "reveal" ҳангоми scroll — барои ҳамаи саҳифаҳое, ки аз ин base мерос мегиранд
+    (function () {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => entry.target.classList.add('in'), i * 60);
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    })();
+</script>
+
+    <main class="flex-grow">
+        {% block content %} {% endblock %}
+    </main>
+
+    <footer class="bg-ink dark:bg-darkbg-card text-white mt-16">
+    <div class="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div>
+            <h2 class="text-2xl font-display font-bold text-white mb-4">Comfort <span class="text-gold">Home</span></h2>
+            <p data-lang="footer_desc" class="text-white/50 text-sm">
+                Беҳтарин платформа барои ҷустуҷӯ ва дарёфти амволи ғайриманқул дар Тоҷикистон.
+            </p>
+        </div>
+
+        <div>
+            <h3 data-lang="footer_links" class="text-sm font-display font-semibold text-white mb-4 uppercase tracking-wide">Истинодҳо</h3>
+            <ul class="space-y-2 text-white/50 text-sm">
+                <li><a href="/" data-lang="home_page" class="hover:text-gold transition">Саҳифаи асосӣ</a></li>
+                <li><a href="{% url 'about' %}" data-lang="terms_of_use" class="hover:text-gold transition">Дар бораи мо</a></li>
+            </ul>
+        </div>
+        <div>
+            
+            <div class="space-y-3 text-white/50 text-sm">
+                <h3 data-lang="footer_contact" class="text-sm font-display font-semibold text-white mb-4 uppercase tracking-wide">Тамос бо мо</h3>
+            <p data-lang="footer_rights" class="text-white/30 text-xs mt-8">&copy; 2026 Comfort Home . Ҳамаи ҳуқуқҳо ҳифз шудаанд.</p>
+                <p class="flex items-center gap-2">
+                    <i class="fa-solid fa-envelope text-gold"></i> -info@comforthome.tj
+                </p>
+                <div class="flex gap-3 mt-4">
+                    <a href="#" aria-label="WhatsApp" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-gold hover:text-gold hover:-translate-y-0.5 transition"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Telegram" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-gold hover:text-gold hover:-translate-y-0.5 transition"><i class="fa-brands fa-telegram" aria-hidden="true"></i></a>
+                    <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:border-gold hover:text-gold hover:-translate-y-0.5 transition"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+
+    
+    </div>
+</footer>
     
 </body>
 </html>
