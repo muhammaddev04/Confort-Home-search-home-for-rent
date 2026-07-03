@@ -1176,6 +1176,204 @@
     }
     window.escapeHtml = escapeHtml;
 
+    const COMPARE_KEY = 'compareList';
+    const COMPARE_MAX = 4;
+    window.__compareCatalog = window.__compareCatalog || {};
+
+    function getCompareIds() {
+        try {
+            const raw = JSON.parse(localStorage.getItem(COMPARE_KEY) || '[]');
+            return Array.isArray(raw) ? raw : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function syncCompareCheckboxes() {
+        const ids = getCompareIds();
+        document.querySelectorAll('.compare-checkbox').forEach((cb) => {
+            cb.checked = ids.includes(parseInt(cb.dataset.propertyId, 10));
+        });
+    }
+
+    function refreshCompareUI() {
+        const ids = getCompareIds();
+        const bar = document.getElementById('compare-bar');
+        const countEl = document.getElementById('compare-count');
+        if (bar && countEl) {
+            countEl.textContent = ids.length;
+            bar.classList.toggle('hidden', ids.length === 0);
+        }
+        syncCompareCheckboxes();
+    }
+
+    function setCompareIds(ids) {
+        localStorage.setItem(COMPARE_KEY, JSON.stringify(ids));
+        refreshCompareUI();
+    }
+
+    // Global — даъват аз checkbox-и "Муқоиса" дар ҳар кортаи амвол.
+    function toggleCompare(id, checked) {
+        id = parseInt(id, 10);
+        let ids = getCompareIds();
+        if (checked) {
+            if (ids.includes(id)) return;
+            if (ids.length >= COMPARE_MAX) {
+                const lang = (localStorage.getItem('selectedLang') || 'tg').toLowerCase();
+                alert((translations[lang] && translations[lang].compare_max_reached) || 'Max 4 properties.');
+                syncCompareCheckboxes();
+                return;
+            }
+            ids.push(id);
+        } else {
+            ids = ids.filter((x) => x !== id);
+        }
+        setCompareIds(ids);
+    }
+    window.toggleCompare = toggleCompare;
+
+    // Event delegation — кор мекунад барои checkbox-ҳое, ки минбаъд низ ба саҳифа
+    // илова мешаванд (масалан пас аз AJAX), бе ниёз ба onchange-и inline дар HTML.
+    document.addEventListener('change', (e) => {
+        if (e.target.matches && e.target.matches('.compare-checkbox')) {
+            toggleCompare(e.target.dataset.propertyId, e.target.checked);
+        }
+    });
+
+    function removeFromCompare(id) {
+        toggleCompare(id, false);
+        renderCompareTable();
+    }
+    window.removeFromCompare = removeFromCompare;
+
+    // Global — саҳифаҳое, ки рӯйхати амволро нишон медиҳанд (кортаҳо), маълумоти
+    // JSON-и худро ба ин catalog илова мекунанд, то ҷадвали муқоиса битавонад
+    // онҳоро аз рӯи ID пайдо кунад — новобаста аз он, ки корбар аз кадом саҳифа
+    // амволро ба муқоиса илова кардааст.
+    function registerCompareData(list) {
+        (list || []).forEach((p) => { window.__compareCatalog[p.id] = p; });
+        refreshCompareUI();
+    }
+    window.registerCompareData = registerCompareData;
+
+    function renderCompareTable() {
+        const wrap = document.getElementById('compare-table-wrap');
+        if (!wrap) return;
+        const lang = (localStorage.getItem('selectedLang') || 'tg').toLowerCase();
+        const dict = translations[lang] || translations.tg;
+        const ids = getCompareIds();
+        const items = ids.map((id) => window.__compareCatalog[id]).filter(Boolean);
+
+        if (!items.length) {
+            wrap.innerHTML = `<p class="text-center text-stone dark:text-gray-400 py-12">${escapeHtml(dict.compare_empty)}</p>`;
+            return;
+        }
+
+        const rows = [
+            { label: dict.compare_row_price, render: (p) => `<span class="font-display font-bold text-emerald dark:text-gold">${Number(p.price).toLocaleString()} TJS</span>` },
+            { label: dict.compare_row_type, render: (p) => escapeHtml(p.type || '—') },
+            { label: dict.compare_row_rooms, render: (p) => escapeHtml(p.rooms ?? '—') },
+            { label: dict.compare_row_area, render: (p) => `${escapeHtml(p.area ?? '—')} m²` },
+            { label: dict.compare_row_floor, render: (p) => escapeHtml(p.floor ?? '—') },
+            { label: dict.compare_row_city, render: (p) => escapeHtml(p.city || '—') },
+            { label: dict.compare_row_district, render: (p) => escapeHtml(p.district || '—') },
+            { label: dict.compare_row_available, render: (p) => `<span class="${p.available ? 'text-emerald dark:text-gold' : 'text-red-500'} font-semibold">${p.available ? dict.compare_yes : dict.compare_no}</span>` },
+            { label: dict.compare_row_verified, render: (p) => p.verified ? `<i class="fa-solid fa-circle-check text-gold" aria-hidden="true"></i> <span class="font-semibold text-emerald dark:text-gold">${dict.compare_yes}</span>` : `<span class="text-stone dark:text-gray-500">${dict.compare_no}</span>` },
+        ];
+
+        const headerCells = items.map((p) => `
+            <th class="p-4 min-w-[180px] align-bottom">
+                <div class="relative rounded-xl overflow-hidden h-28 mb-3 bg-cream dark:bg-white/5">
+                    ${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-stone/40"><i class="fa-regular fa-image text-2xl"></i></div>`}
+                    <button type="button" onclick="removeFromCompare(${p.id})" aria-label="${escapeHtml(dict.compare_remove)}" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-ink/60 hover:bg-red-500 text-white flex items-center justify-center text-xs transition">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <p class="font-display font-semibold text-sm text-ink dark:text-white leading-snug mb-2">${escapeHtml(p.title)}</p>
+                <a href="${escapeHtml(p.url)}" class="inline-block text-xs font-semibold text-emerald dark:text-gold hover:underline">${escapeHtml(dict.compare_details)} &rarr;</a>
+            </th>
+        `).join('');
+
+        const bodyRows = rows.map((row) => `
+            <tr class="border-t border-ink/5 dark:border-white/10">
+                <td class="p-4 text-xs font-bold uppercase tracking-wide text-stone dark:text-gray-400 sticky left-0 bg-white dark:bg-darkbg-card">${escapeHtml(row.label)}</td>
+                ${items.map((p) => `<td class="p-4 text-sm text-ink dark:text-gray-200">${row.render(p)}</td>`).join('')}
+            </tr>
+        `).join('');
+
+        wrap.innerHTML = `
+            <table class="w-full border-collapse">
+                <thead><tr>
+                    <th class="p-4 sticky left-0 bg-white dark:bg-darkbg-card"></th>
+                    ${headerCells}
+                </tr></thead>
+                <tbody>${bodyRows}</tbody>
+            </table>
+        `;
+    }
+
+    (function initCompareModal() {
+        const bar = document.getElementById('compare-bar');
+        if (!bar) return;
+        const modal = document.getElementById('compare-modal');
+        const openBtn = document.getElementById('compare-open-btn');
+        const closeBtn = document.getElementById('compare-close-btn');
+        const backdrop = document.getElementById('compare-modal-backdrop');
+        const clearBtn = document.getElementById('compare-clear-btn');
+
+        const openModal = () => {
+            renderCompareTable();
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+        const closeModal = () => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        backdrop.addEventListener('click', closeModal);
+        clearBtn.addEventListener('click', () => setCompareIds([]));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+        });
+
+        refreshCompareUI();
+    })();
+
+    /**
+     * changeLanguage — забони фаъоли UI-ро иваз мекунад: дар localStorage захира
+     * мекунад, ҳолати селектор ва атрибути lang-и <html>-ро навсозӣ мекунад, ва
+     * updateAllTranslations()-ро дар тамоми ҳуҷҷат иҷро мекунад.
+     * Global аст (window.changeLanguage), то аз ҳар ҷои дигари саҳифа низ даъват шавад.
+     */
+    function changeLanguage(lang) {
+        lang = (lang || 'tg').toLowerCase();
+        if (!translations[lang]) lang = 'tg';
+
+        localStorage.setItem('selectedLang', lang);
+
+        const selector = document.getElementById('langSelector');
+        if (selector) selector.value = lang;
+
+        updateAllTranslations();
+
+        document.documentElement.setAttribute('lang', lang);
+    }
+    window.changeLanguage = changeLanguage;
+
+    document.getElementById('langSelector').addEventListener('change', (e) => {
+        changeLanguage(e.target.value);
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+        changeLanguage(localStorage.getItem('selectedLang') || 'tg');
+    });
+
+
+
+
 </script>
 </body>
 </html>
