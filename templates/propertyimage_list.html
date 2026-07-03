@@ -1,34 +1,22 @@
 {% extends 'base.html' %}
+
 {% block content %}
-
-<div class="max-w-md mx-auto bg-white dark:bg-white/5 p-8 rounded-3xl shadow-soft border border-ink/5 dark:border-white/10 mt-16">
-    <h2 data-lang="img_add_btn" class="font-display text-xl font-bold text-ink dark:text-white mb-6 text-center">+ Иловаи сурат</h2>
-
-    {% if form.non_field_errors %}
-        {% for err in form.non_field_errors %}
-        <p class="text-red-500 text-sm mb-3">{{ err }}</p>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+    <h1 class="font-display text-2xl sm:text-3xl font-bold text-ink dark:text-white border-b-2 border-gold inline-block pb-2 mb-8">Рӯйхати суратҳо.</h1>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-5">
+        {% for img in propertyimages %}
+            <div class="card-hover bg-white dark:bg-white/5 rounded-2xl border border-ink/5 dark:border-white/10 shadow-sm overflow-hidden">
+                <div class="img-zoom h-40 overflow-hidden">
+                    <img src="{{ img.image.url }}" class="w-full h-full object-cover">
+                </div>
+                <p class="p-3 text-sm font-medium text-ink dark:text-gray-200 truncate">{{ img.property.title }}</p>
+            </div>
+        {% empty %}
+            <div class="col-span-2 sm:col-span-3 text-center py-16 bg-white dark:bg-white/5 rounded-2xl border border-dashed border-ink/10 dark:border-white/10">
+                <i class="fa-regular fa-images text-4xl text-stone/40 dark:text-gray-600 mb-4"></i>
+                <p class="text-stone dark:text-gray-400">Ҳанӯз сурате илова нашудааст.</p>
+            </div>
         {% endfor %}
-    {% endif %}
-
-    <form method="POST" enctype="multipart/form-data" class="dh-form space-y-5">
-    {% csrf_token %}
-
-    <div>
-        <label data-lang="select_prop">Интихоби амвол</label>
-        {{ form.property }}
-        {% for err in form.property.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
     </div>
-
-    <div>
-        <label data-lang="select_file">Суратро интихоб кунед.</label>
-        {{ form.image }}
-        {% for err in form.image.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
-    </div>
-
-    <button type="submit" data-lang="save_btn" class="gradient-btn glow-shadow w-full text-white font-display font-bold py-2.5 rounded-xl transition">
-        Бор кардан!
-    </button>
-</form>
 </div>
-
 {% endblock %}

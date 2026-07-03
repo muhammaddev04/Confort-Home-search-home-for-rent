@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="max-w-md mx-auto bg-white dark:bg-white/5 p-8 rounded-3xl shadow-soft border border-ink/5 dark:border-white/10 mt-16">
+    <h2 data-lang="img_add_btn" class="font-display text-xl font-bold text-ink dark:text-white mb-6 text-center">+ Иловаи сурат</h2>
+
+    {% if form.non_field_errors %}
+        {% for err in form.non_field_errors %}
+        <p class="text-red-500 text-sm mb-3">{{ err }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="dh-form space-y-5">
+    {% csrf_token %}
+
+    <div>
+        <label data-lang="select_prop">Интихоби амвол</label>
+        {{ form.property }}
+        {% for err in form.property.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <div>
+        <label data-lang="select_file">Суратро интихоб кунед.</label>
+        {{ form.image }}
+        {% for err in form.image.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+    </div>
+
+    <button type="submit" data-lang="save_btn" class="gradient-btn glow-shadow w-full text-white font-display font-bold py-2.5 rounded-xl transition">
+        Бор кардан!
+    </button>
+</form>
+</div>
+
+{% endblock %}
