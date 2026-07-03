@@ -35,3 +35,12 @@ class Property_Image(models.Model):
 
     def __str__(self):
         return f"Image for {self.property.title}"
+    
+
+class Favorite(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='favorites')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user.username} -> {self.property.title}'
