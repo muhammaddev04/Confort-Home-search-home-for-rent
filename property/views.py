@@ -376,3 +376,28 @@ def propertyimage_list(request):
 
     return render(request, 'propertyimage_list.html', {'propertyimages': propertyimages})
 
+
+
+@login_required
+def create_propertyimage(request):
+    if not request.user.is_authenticated or request.user.role not in ('landlord', 'admin'):
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = PropertyImageForm(request.POST, request.FILES, owner=request.user)
+        if form.is_valid():
+            # Мутмаин мешавем, ки хонаи интихобшуда воқеан ба ҳамин корбар тааллуқ дорад
+            prop = get_object_or_404(Property, pk=form.cleaned_data['property'].pk, owner=request.user)
+            image = form.save(commit=False)
+            image.property = prop
+            image.save()
+            return redirect('propertyimages_list')
+        return render(request, 'propertyimage_form.html', {
+            'form': form,
+            'propertys': Property.objects.filter(owner=request.user),
+        })
+
+    return render(request, 'propertyimage_form.html', {
+        'form': PropertyImageForm(owner=request.user),
+        'propertys': Property.objects.filter(owner=request.user),
+    })
