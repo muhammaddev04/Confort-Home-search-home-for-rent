@@ -8,7 +8,7 @@ from random import randint
 
 from .models import EmailConfirm, User
 
-@login_required
+
 def send_email_confirmation(user):
     code = randint(100000, 999999)
     EmailConfirm.objects.update_or_create(
@@ -28,7 +28,7 @@ def send_email_confirmation(user):
         print(e, '=== Хатои фиристодани почта ===')
 
 
-@login_required
+
 def register_view(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -72,7 +72,7 @@ def register_view(request):
     return render(request, 'register.html')
 
 
-@login_required
+
 def confirm_email(request):
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
@@ -95,7 +95,7 @@ def confirm_email(request):
 
     return render(request, 'confirm.html')
 
-@login_required
+
 def resend_confirmation(request):
     """
     ФУНКСИЯИ НАВ: агар рамз ба почта нарасад ё вақташ гузашта бошад,
