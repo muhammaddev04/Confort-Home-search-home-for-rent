@@ -270,3 +270,29 @@ def property_detail(request, pk):
         'market_count': market_count,
         'market_diff_pct': market_diff_pct,
     })
+
+
+def properties_map_data(request):
+    
+    propertys = Property.objects.filter(
+        is_available=True,
+        latitude__isnull=False,
+        longitude__isnull=False,
+    ).select_related('owner')[:200]
+
+    data = [
+        {
+            'id': p.id,
+            'title': p.title,
+            'price': str(p.price),
+            'city': p.city or '',
+            'district': p.district or '',
+            'lat': float(p.latitude),
+            'lng': float(p.longitude),
+            'type': p.get_property_type_display(),
+            'url': f'/property/{p.id}/',
+            'image': p.images.first().image.url if p.images.first() else None,
+        }
+        for p in propertys
+    ]
+    return JsonResponse({'properties': data})
