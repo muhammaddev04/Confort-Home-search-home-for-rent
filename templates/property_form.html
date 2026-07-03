@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="max-w-2xl mx-auto bg-white dark:bg-white/5 p-8 rounded-3xl shadow-soft border border-ink/5 dark:border-white/10 mt-12 mb-12">
+    <h2 data-lang="form_prop_title" class="font-display text-2xl font-bold text-ink dark:text-white mb-6 text-center">Формаи амвол</h2>
+
+    {% if form.non_field_errors %}
+    <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 p-4 rounded-xl mb-6">
+        {% for err in form.non_field_errors %}
+        <p class="text-sm text-red-700 dark:text-red-300 font-medium">{{ err }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" class="dh-form space-y-5">
+        {% csrf_token %}
+
+        <div>
+            <label data-lang="table_title">Ном *</label>
+            {{ form.title }}
+            {% for err in form.title.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label data-lang="label_type">Намуди амвол *</label>
+                {{ form.property_type }}
+                {% for err in form.property_type.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+            </div>
+
+            <div>
+                <label data-lang="table_price">Нарх (TJS) *</label>
+                {{ form.price }}
+                {% for err in form.price.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label data-lang="rooms">Ҳуҷраҳо *</label>
+                {{ form.rooms }}
+                {% for err in form.rooms.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+            </div>
+
+            <div>
+                <label data-lang="area">Масоҳат (-м²) *</label>
+                {{ form.area }}
+                {% for err in form.area.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <label data-lang="floor">Ошёна</label>
+            {{ form.floor }}
+            {% for err in form.floor.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label data-lang="table_city">Шаҳр</label>
+                {{ form.city }}
+                {% for err in form.city.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+            </div>
+
+            <div>
+                <label data-lang="label_district">Ноҳия *</label>
+                {{ form.district }}
+                {% for err in form.district.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <label data-lang="label_address">Суроғаи дақиқ *</label>
+            {{ form.address_details }}
+            {% for err in form.address_details.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+        </div>
+
+        <div>
+            <label data-lang="label_amenities">Шароитҳо *</label>
+            {{ form.amenities }}
+            {% for err in form.amenities.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+        </div>
+
+        <div>
+            <label data-lang="description">Тавсиф</label>
+            {{ form.description }}
+            {% for err in form.description.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+        </div>
+
+
+        <div class="flex items-center gap-2">
+            {{ form.is_available }}
+            <label for="{{ form.is_available.id_for_label }}" class="!mb-0 !text-sm !normal-case !font-medium !tracking-normal text-ink/80 dark:text-gray-300 cursor-pointer" data-lang="label_available">Барои иҷора/фурӯш омода аст</label>
+        </div>
+
+        <button type="submit" data-lang="save_btn" class="gradient-btn glow-shadow w-full text-white font-display font-bold py-3 rounded-xl transition">
+            Захира кардан
+        </button>
+    </form>
+</div>
+
+{% endblock %}
