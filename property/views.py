@@ -12,6 +12,9 @@ from dotenv import load_dotenv
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Property, Favorite, Message
+from django.db.models import Q
+
+
 
 
 
@@ -172,4 +175,47 @@ def home(request):
         propertys = propertys.filter(price__lte=max_price)
 
     return render(request, 'home.html', {'propertys': propertys, 'favorite_property_ids': favorite_property_ids})
+
+
+
+@login_required
+def about(request):
+    return render(request, 'about.html')
+
+@login_required
+def property_search(request):
+    """
+    Саҳифаи ҷустуҷӯи ҷамъиятӣ — ҲАМАИ хонаҳои дастрасро нишон медиҳад
+    (на танҳо хонаҳои худи корбар). Барои tenant/landlord/анонимӣ кушода аст.
+    """
+    propertys = Property.objects.filter(is_available=True)
+
+    city = request.GET.get('city')
+    if isinstance(city, str):
+        city = city.strip()
+    if city:
+        propertys = propertys.filter(city__icontains=city)
+
+    district = request.GET.get('district')
+    if isinstance(district, str):
+        district = district.strip()
+    if district:
+        propertys = propertys.filter(district__icontains=district)
+
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    if min_price and max_price:
+        propertys = propertys.filter(price__range=(min_price, max_price))
+    elif min_price:
+        propertys = propertys.filter(price__gte=min_price)
+    elif max_price:
+        propertys = propertys.filter(price__lte=max_price)
+
+    property_type = request.GET.get('property_type')
+    if property_type:
+        propertys = propertys.filter(property_type=property_type)
+
+    return render(request, 'property_search.html', {
+        'propertys': propertys.order_by('-created_at'),
+    })
 
