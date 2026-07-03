@@ -112,3 +112,26 @@ def resend_confirmation(request):
         return render(request, 'confirm.html', {'user': user})
 
     return render(request, 'confirm.html')
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if not user:
+            return render(request, 'login.html', {'error': 'Номи корбар ё рамз нодуруст аст ё сабти ном накардаед!'})
+
+        if not user.is_active:
+            return render(request, 'login.html', {'error': 'Аввал почтаи худро тасдиқ кунед'})
+
+        login(request, user)
+        next_url = request.POST.get('next') or request.GET.get('next')
+        return redirect(next_url or 'home')
+
+    return render(request, 'login.html', {'next': request.GET.get('next', '')})
