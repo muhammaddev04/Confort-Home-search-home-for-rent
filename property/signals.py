@@ -1,8 +1,4 @@
-"""
-Сигналҳои Property — рафтори "паҳлӯӣ" (side effect: логкунӣ) аз view/model
-дур карда шудааст, то мантиқ ҳар ҷое ки объект сохта/нест мешавад (аз view,
-admin, шелл ё скрипт) якхела кор кунад.
-"""
+
 import logging
 
 from django.db.models.signals import post_delete, post_save
