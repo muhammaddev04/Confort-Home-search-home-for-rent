@@ -145,3 +145,31 @@ def ask_groq_view(request):
         return JsonResponse({'response': 'Хатогӣ ҳангоми пайвастшавӣ ба AI. Лутфан баъдтар кӯшиш кунед.'}, status=502)
 
 
+
+@login_required
+def home(request):
+    propertys = Property.objects.all()
+    favorite_property_ids = []
+    
+    if request.user.is_authenticated:
+        favorite_property_ids = Favorite.objects.filter(user=request.user).values_list('property_id', flat=True)
+
+    
+    city = request.GET.get('q')
+    if city and isinstance(city, str):
+        propertys = propertys.filter(city__icontains=city.strip())
+
+    district = request.GET.get('qu')
+    if district and isinstance(district, str):
+        propertys = propertys.filter(district__icontains=district.strip())
+
+    min_price = request.GET.get('min_price')
+    if min_price:
+        propertys = propertys.filter(price__gte=min_price)
+
+    max_price = request.GET.get('max_price')
+    if max_price:
+        propertys = propertys.filter(price__lte=max_price)
+
+    return render(request, 'home.html', {'propertys': propertys, 'favorite_property_ids': favorite_property_ids})
+
