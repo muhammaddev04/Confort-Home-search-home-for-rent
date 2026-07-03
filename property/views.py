@@ -422,3 +422,13 @@ def update_propertyimage(request, pk):
         'propertyimage': propertyimage,
     })
 
+
+
+@login_required
+def delete_propertyimage(request, pk):
+    propertyimage = get_object_or_404(Property_Image, pk=pk, property__owner=request.user)
+
+    if request.method == 'POST':
+        propertyimage.delete()
+        return redirect('propertyimages_list')
+    return render(request, 'delete_propertyimages.html', {'propertyimage': propertyimage})

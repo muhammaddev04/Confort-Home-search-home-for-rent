@@ -2,9 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-     path('', views.home, name='home'),
-     path('about/', views.about, name='about'),
-     path('search/', views.property_search, name='property_search'),
+    path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
+    path('search/', views.property_search, name='property_search'),
     path('property/<int:pk>/', views.property_detail, name='property_detail'),
     path('api/properties-map/', views.properties_map_data, name='properties_map_data'),
     path('dashboard/', views.landlord_dashboard, name='landlord_dashboard'), 
@@ -14,5 +14,6 @@ urlpatterns = [
     path('delete-property/<int:pk>/', views.delete_property, name='delete_property'),
     path('propertyimages/', views.propertyimage_list, name='propertyimages_list'),
     path('create-propertyimages/', views.create_propertyimage, name='create_propertyimages'),
-     path('update-propertyimages/<int:pk>/', views.update_propertyimage, name='update_propertyimages'),
+    path('update-propertyimages/<int:pk>/', views.update_propertyimage, name='update_propertyimages'),
+    path('delete-propertyimages/<int:pk>/', views.delete_propertyimage, name='delete_propertyimages'),
 ]
