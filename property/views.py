@@ -360,3 +360,19 @@ def delete_property(request, pk):
         prop.delete()
         return redirect('property_list')
     return render(request, 'property_confirm_delete.html', {'property': prop})
+
+
+
+@login_required
+def propertyimage_list(request):
+    """Аксҳои марбут ба хонаҳои худи соҳибхона."""
+    propertyimages = Property_Image.objects.filter(property__owner=request.user)
+
+    query = request.GET.get('q')
+    if isinstance(query, str):
+        query = query.strip()
+    if query:
+        propertyimages = propertyimages.filter(property__title__icontains=query)
+
+    return render(request, 'propertyimage_list.html', {'propertyimages': propertyimages})
+
