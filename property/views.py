@@ -182,12 +182,10 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
+
 @login_required
 def property_search(request):
-    """
-    Саҳифаи ҷустуҷӯи ҷамъиятӣ — ҲАМАИ хонаҳои дастрасро нишон медиҳад
-    (на танҳо хонаҳои худи корбар). Барои tenant/landlord/анонимӣ кушода аст.
-    """
+    
     propertys = Property.objects.filter(is_available=True)
 
     city = request.GET.get('city')
@@ -219,3 +217,56 @@ def property_search(request):
         'propertys': propertys.order_by('-created_at'),
     })
 
+
+
+def property_detail(request, pk):
+    prop = get_object_or_404(Property, pk=pk)
+    is_favorited = False
+    messages = []
+
+
+    if request.method == 'POST' and request.user.is_authenticated:
+
+        if 'send_message' in request.POST:
+            content = (request.POST.get('content') or '').strip()
+            if content:
+                Message.objects.create(
+                    sender=request.user,
+                    receiver=prop.owner,
+                    property=prop,
+                    content=content
+                )
+            return redirect('property_detail', pk=pk)
+
+        
+
+
+    if request.user.is_authenticated:
+        is_favorited = Favorite.objects.filter(user=request.user, property=prop).exists()
+
+
+        messages = Message.objects.filter(property=prop).filter(
+            Q(sender=request.user) | Q(receiver=request.user)
+        ).order_by('timestamp')
+
+    
+    comparables = Property.objects.filter(
+        city=prop.city,
+        property_type=prop.property_type,
+    ).exclude(pk=prop.pk)
+    market_stats = comparables.aggregate(avg_price=Avg('price'))
+    market_avg = market_stats['avg_price']
+    market_count = comparables.count()
+    market_diff_pct = None
+    if market_avg:
+        market_avg = round(market_avg, 2)
+        market_diff_pct = round(((prop.price - market_avg) / market_avg) * 100)
+
+    return render(request, 'property_detail.html', {
+        'property': prop,
+        'is_favorited': is_favorited,
+        'messages': messages,
+        'market_avg': market_avg,
+        'market_count': market_count,
+        'market_diff_pct': market_diff_pct,
+    })
