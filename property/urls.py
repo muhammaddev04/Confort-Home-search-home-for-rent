@@ -14,4 +14,5 @@ urlpatterns = [
     path('delete-property/<int:pk>/', views.delete_property, name='delete_property'),
     path('propertyimages/', views.propertyimage_list, name='propertyimages_list'),
     path('create-propertyimages/', views.create_propertyimage, name='create_propertyimages'),
+     path('update-propertyimages/<int:pk>/', views.update_propertyimage, name='update_propertyimages'),
 ]

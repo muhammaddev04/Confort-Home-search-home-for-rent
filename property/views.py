@@ -401,3 +401,24 @@ def create_propertyimage(request):
         'form': PropertyImageForm(owner=request.user),
         'propertys': Property.objects.filter(owner=request.user),
     })
+
+
+@login_required
+def update_propertyimage(request, pk):
+    propertyimage = get_object_or_404(Property_Image, pk=pk, property__owner=request.user)
+
+    if request.method == 'POST':
+        form = PropertyImageForm(request.POST, request.FILES, instance=propertyimage, owner=request.user)
+        if form.is_valid():
+            prop = get_object_or_404(Property, pk=form.cleaned_data['property'].pk, owner=request.user)
+            image = form.save(commit=False)
+            image.property = prop
+            image.save()
+            return redirect('propertyimages_list')
+        return render(request, 'update_propertyimages.html', {'form': form, 'propertyimage': propertyimage})
+
+    return render(request, 'update_propertyimages.html', {
+        'form': PropertyImageForm(instance=propertyimage, owner=request.user),
+        'propertyimage': propertyimage,
+    })
+
