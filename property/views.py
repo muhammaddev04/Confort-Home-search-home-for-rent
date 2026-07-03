@@ -480,3 +480,8 @@ def delete_favorite(request, pk):
         favorite.delete()
         return redirect('favorite_list')
     return render(request, 'delete_favorites.html', {'favorite': favorite})
+
+
+@login_required
+def landlord_dashboard(request):
+    return render(request, 'dashboard/landlord_dashboard.html')
