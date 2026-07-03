@@ -70,3 +70,27 @@ def register_view(request):
         return render(request, 'confirm.html', {'user': user})
 
     return render(request, 'register.html')
+
+
+
+def confirm_email(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        code = request.POST.get('code', '').strip()
+
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return render(request, 'confirm.html', {'error': 'Почтаи нодуруст'})
+
+        confirm_code = EmailConfirm.objects.filter(user=user).first()
+
+        if not confirm_code or code != confirm_code.code:
+            return render(request, 'confirm.html', {'error': 'Рамзи нодуруст', 'user': user})
+
+        user.is_active = True
+        user.save()
+        confirm_code.delete()
+        flash.success(request, 'Почтаи шумо тасдиқ шуд! Акнун ворид шавед.')
+        return redirect('login')
+
+    return render(request, 'confirm.html')
