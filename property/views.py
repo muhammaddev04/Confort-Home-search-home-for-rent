@@ -470,3 +470,13 @@ def toggle_favorite(request, pk):
         return redirect(request.META.get('HTTP_REFERER', 'home'))
         
     return redirect('home')
+
+
+@login_required
+def delete_favorite(request, pk):
+    favorite = get_object_or_404(Favorite, pk=pk, user=request.user)
+
+    if request.method == 'POST':
+        favorite.delete()
+        return redirect('favorite_list')
+    return render(request, 'delete_favorites.html', {'favorite': favorite})
