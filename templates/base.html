@@ -331,6 +331,59 @@
     
     </div>
 </footer>
+{% if user.is_authenticated %}
+    <!-- ============ AI ASSISTANT WIDGET ============ -->
+    <button id="chat-btn" type="button" aria-label="Кушодани ёрдамчии AI" aria-expanded="false" aria-controls="chat-window"
+        class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full gradient-btn glow-shadow text-white flex items-center justify-center text-xl transition active:scale-95">
+        <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+    </button>
+
+    <div id="chat-window" role="dialog" aria-modal="false" aria-label="Ёрдамчии AI" class="hidden fixed bottom-24 right-5 sm:right-6 z-50 w-[92vw] max-w-sm bg-white dark:bg-darkbg-card rounded-2xl shadow-lifted border border-ink/5 dark:border-white/10 overflow-hidden flex flex-col" style="max-height: 70vh;">
+        <div class="flex items-center justify-between px-5 py-4 bg-emerald text-white shrink-0">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-sparkles text-gold" aria-hidden="true"></i>
+                <h2 data-lang="chat_title" class="font-display font-semibold text-sm">Ёрдамчии AI</h2>
+            </div>
+            <button id="chat-close-btn" type="button" aria-label="Пӯшидани ёрдамчии AI" class="p-1.5 rounded-lg hover:bg-white/10 transition">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div id="chat-body" class="flex-grow overflow-y-auto px-4 py-4 space-y-3 text-sm bg-cream dark:bg-white/5">
+            <p data-lang="chat_empty" class="text-stone dark:text-gray-400 text-xs italic">Саволи худро дар бораи амволҳо бипурсед.</p>
+        </div>
+        <form id="chat-form" onsubmit="event.preventDefault(); document.getElementById('send-btn').click();" class="flex items-center gap-2 p-3 border-t border-ink/5 dark:border-white/10 bg-white dark:bg-darkbg-card shrink-0">
+            <label for="chat-input" class="sr-only">Паём</label>
+            <input id="chat-input" type="text" autocomplete="off" data-lang-placeholder="chat_placeholder" placeholder="Паёми худро нависед..."
+                class="flex-grow px-3 py-2 rounded-lg border border-ink/10 dark:border-white/10 bg-cream dark:bg-white/5 dark:text-white text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition">
+            <button id="send-btn" type="button" data-lang="chat_send" aria-label="Фиристодани паём" class="gradient-btn text-white px-4 py-2 rounded-lg text-sm font-display font-semibold transition active:scale-95">Фиристодан</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- ============ SMART COMPARISON — floating bar + modal ============ -->
+    <div id="compare-bar" class="hidden fixed bottom-5 left-5 z-50 bg-white dark:bg-darkbg-card rounded-2xl shadow-lifted border border-ink/5 dark:border-white/10 pl-5 pr-3 py-3 flex items-center gap-3">
+        <div class="flex items-center gap-2 text-sm font-medium text-ink dark:text-white">
+            <i class="fa-solid fa-scale-balanced text-gold" aria-hidden="true"></i>
+            <span id="compare-count">0</span> <span data-lang="compare_selected">амвол интихоб шуд</span>
+        </div>
+        <button id="compare-open-btn" type="button" data-lang="compare_view" class="gradient-btn text-white text-sm font-display font-semibold px-4 py-2 rounded-lg transition active:scale-95">Муқоиса кардан</button>
+        <button id="compare-clear-btn" type="button" aria-label="Тоза кардан" class="w-8 h-8 rounded-lg flex items-center justify-center text-stone hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition">
+            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <div id="compare-modal" role="dialog" aria-modal="true" aria-label="Муқоисаи амволҳо" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div id="compare-modal-backdrop" class="absolute inset-0 bg-ink/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white dark:bg-darkbg-card rounded-3xl shadow-lifted w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-ink/5 dark:border-white/10 shrink-0">
+                <h2 class="font-display text-xl font-bold text-ink dark:text-white" data-lang="compare_title">Муқоисаи амволҳо</h2>
+                <button id="compare-close-btn" type="button" aria-label="Пӯшидан" class="p-2 rounded-lg hover:bg-ink/5 dark:hover:bg-white/10 transition">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div id="compare-table-wrap" class="overflow-auto p-6"></div>
+        </div>
+    </div>
     
 </body>
 </html>
