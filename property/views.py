@@ -318,3 +318,21 @@ def property_list(request):
    
     return render(request, 'property_search.html', {'propertys': propertys})
 
+
+
+@login_required
+def create_property(request):
+    if not request.user.is_authenticated or request.user.role not in ('landlord', 'admin'):
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = PropertyForm(request.POST)
+        if form.is_valid():
+            prop = form.save(commit=False)
+            prop.owner = request.user
+            prop.save()
+            return redirect('property_list')
+        return render(request, 'property_form.html', {'form': form})
+
+    return render(request, 'property_form.html', {'form': PropertyForm()})
+

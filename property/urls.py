@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/properties-map/', views.properties_map_data, name='properties_map_data'),
     path('dashboard/', views.landlord_dashboard, name='landlord_dashboard'), 
     path('my-properties/', views.property_list, name='property_list'),
+    path('create-property/', views.create_property, name='create_property'),
 ]
