@@ -432,3 +432,19 @@ def delete_propertyimage(request, pk):
         propertyimage.delete()
         return redirect('propertyimages_list')
     return render(request, 'delete_propertyimages.html', {'propertyimage': propertyimage})
+
+
+@login_required
+def favorite_list(request):
+    if not request.user.is_authenticated or request.user.role not in ('tenant', 'admin'):
+        return redirect('home')
+        
+    favorites = Favorite.objects.filter(user=request.user).select_related('property')
+    
+   
+    favorite_properties = [fav.property for fav in favorites]
+    
+    
+    return render(request, 'favorites_list.html', {
+        'favorite_properties': favorite_properties
+    })
