@@ -94,3 +94,21 @@ def confirm_email(request):
         return redirect('login')
 
     return render(request, 'confirm.html')
+
+
+def resend_confirmation(request):
+    """
+    ФУНКСИЯИ НАВ: агар рамз ба почта нарасад ё вақташ гузашта бошад,
+    корбар метавонад бе сабти номи такрорӣ рамзи навро дархост кунад.
+    """
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        user = User.objects.filter(email=email, is_active=False).first()
+        if user:
+            send_email_confirmation(user)
+            flash.success(request, 'Рамзи нав фиристода шуд.')
+        else:
+            flash.error(request, 'Ин почта ёфт нашуд ё аллакай тасдиқ шудааст.')
+        return render(request, 'confirm.html', {'user': user})
+
+    return render(request, 'confirm.html')
