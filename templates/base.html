@@ -164,6 +164,93 @@
     </style>
 </head>
 <body class="bg-cream dark:bg-darkbg font-sans text-ink dark:text-gray-100 flex flex-col min-h-screen">
+<nav class="bg-cream/90 dark:bg-darkbg-card/90 backdrop-blur-md sticky top-0 z-50 border-b border-ink/10 dark:border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            <div class="flex items-center">
+                <a href="{% url 'home' %}" class="text-xl sm:text-2xl font-display font-bold text-ink dark:text-white tracking-tight">
+                    Comfort <span class="text-emerald dark:text-gold">Home</span>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-1 sm:gap-2">
+                <div class="hidden lg:flex items-center gap-1">
+                    <a href="{% url 'home' %}" data-lang="nav_home" class="underline-grow px-4 py-2 text-ink/70 dark:text-gray-300 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Асосӣ</a>
+                    <a href="{% url 'about' %}" data-lang="nav_about" class="underline-grow px-4 py-2 text-ink/70 dark:text-gray-300 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Дар бораи мо</a>
+                    
+
+                    <div class="h-6 w-px bg-ink/10 dark:bg-gray-700 mx-2"></div> {% if user.is_authenticated %}
+                        {% if user.role != 'landlord' %}
+                            <a href="{% url 'favorite_list' %}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-ink/70 dark:text-gray-300 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium transition text-sm">
+                                <i class="fa-solid fa-heart"></i> <span data-lang="favorites_btn">Маҳбубҳо</span>
+                            </a>
+                        {% endif %}
+
+                        {% if user.role == 'landlord' %}
+                        <a href="{% url 'property_list' %}" data-lang="nav_properties" class="underline-grow px-4 py-2 text-ink/70 dark:text-gray-300 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Амволҳо</a>
+                        <a href="{% url 'create_property' %}" data-lang="nav_add" class="bg-emerald hover:bg-emerald-mid text-white px-4 py-2 rounded-lg font-display font-semibold text-sm transition">Эълон +</a>
+                        <a href="{% url 'create_propertyimages' %}" data-lang="add_images" class="border border-ink/15 dark:border-white/10 text-ink/70 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-ink/5 dark:hover:bg-white/10 font-medium transition text-sm">Иловаи сурат +</a>
+                        {% endif %}
+
+                        <a href="{% url 'logout' %}" data-lang="logout_btn" class="border border-ink/15 dark:border-white/10 text-ink/70 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-ink/5 dark:hover:bg-white/10 font-medium transition text-sm">Баромад</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" data-lang="login_btn" class="text-ink/70 dark:text-gray-300 hover:text-emerald dark:hover:text-gold px-4 py-2 font-medium transition text-sm">Вуруд</a>
+                        <a href="{% url 'register' %}" data-lang="nav_register" class="bg-emerald hover:bg-emerald-mid text-white px-5 py-2 rounded-lg font-display font-semibold text-sm transition">Регистрация</a>
+                    {% endif %}
+                </div>
+
+                <select id="langSelector" aria-label="Забони сайт / Язык сайта / Site language" class="bg-white dark:bg-white/10 border border-ink/10 dark:border-white/10 text-ink/70 dark:text-white py-1.5 px-2 sm:px-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-gold cursor-pointer text-xs sm:text-sm font-medium ml-1">
+                    <option value="tg">🇹🇯 ТҶ</option>
+                    <option value="ru">🇷🇺 РУ</option>
+                    <option value="en">🇬🇧 EN</option>
+                </select>
+                <button id="theme-toggle" aria-label="Иваз кардани реҷими торик/рӯшан" class="p-2 rounded-lg border border-ink/10 dark:border-white/10 hover:bg-ink/5 dark:hover:bg-white/10 transition">
+                    <i class="fa-solid fa-moon dark:hidden text-ink/70 text-sm"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-gold text-sm"></i>
+                </button>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}" data-lang-title="nav_profile" title="{{ user.username }}" class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald text-white rounded-full overflow-hidden flex items-center justify-center font-display font-bold text-xs sm:text-sm ml-0.5 sm:ml-1 shrink-0 hover:opacity-90 transition">
+                    {% if user.photo %}
+                        <img src="{{ user.photo.url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
+                    {% else %}
+                        {{ user.username|slice:":1"|upper }}
+                    {% endif %}
+                </a>
+                {% endif %}
+
+                <button id="mobile-menu-toggle" class="lg:hidden p-2 rounded-lg border border-ink/10 dark:border-white/10 hover:bg-ink/5 dark:hover:bg-white/10 transition text-ink/70 dark:text-white ml-0.5" aria-label="Кушодани меню" aria-expanded="false" aria-controls="mobile-menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MOBILE MENU ============ -->
+    <div id="mobile-menu" class="hidden lg:hidden border-t border-ink/10 dark:border-gray-800 bg-cream dark:bg-darkbg-card px-4 pt-3 pb-5 space-y-1" role="dialog" aria-modal="true" aria-label="Менюи мобилӣ">
+        <a href="{% url 'home' %}" data-lang="nav_home" class="block px-4 py-3 rounded-lg text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Асосӣ</a>
+        <a href="{% url 'about' %}" data-lang="nav_about" class="block px-4 py-3 rounded-lg text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Дар бораи мо</a>
+        <a href="{% url 'property_list' %}" data-lang="nav_properties" class="block px-4 py-3 rounded-lg text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium text-sm transition">Амволҳо</a>
+
+        <div class="h-px bg-ink/10 dark:bg-gray-800 my-2"></div>
+
+        {% if user.is_authenticated %}
+            {% if user.role != 'landlord' %}
+                <a href="{% url 'favorite_list' %}" class="flex items-center gap-2 px-4 py-3 rounded-lg text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium transition text-sm">
+                    <i class="fa-solid fa-heart"></i> <span data-lang="favorites_btn">Маҳбубҳо</span>
+                </a>
+            {% endif %}
+            {% if user.role == 'landlord' %}
+            <a href="{% url 'create_property' %}" data-lang="nav_add" class="block text-center px-4 py-3 rounded-lg bg-emerald text-white font-display font-semibold text-sm transition">Эълон +</a>
+            <a href="{% url 'create_propertyimages' %}" data-lang="add_images" class="block px-4 py-3 rounded-lg border border-ink/15 dark:border-white/10 text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/10 font-medium transition text-sm">Иловаи сурат +</a>
+            {% endif %}
+            <a href="{% url 'logout' %}" data-lang="logout_btn" class="block px-4 py-3 rounded-lg border border-ink/15 dark:border-white/10 text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/10 font-medium transition text-sm">Баромад</a>
+        {% else %}
+            <a href="{% url 'login' %}" data-lang="login_btn" class="block px-4 py-3 rounded-lg text-ink/80 dark:text-gray-200 hover:bg-ink/5 dark:hover:bg-white/5 hover:text-emerald dark:hover:text-gold font-medium transition text-sm">Вуруд</a>
+            <a href="{% url 'register' %}" data-lang="nav_register" class="block text-center px-4 py-3 rounded-lg bg-emerald text-white font-display font-semibold text-sm transition">Регистрация</a>
+        {% endif %}
+    </div>
+</nav>
 
     
 </body>
